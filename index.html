@@ -1,0 +1,2835 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShelVey - Automated Content Distribution & Link Management</title>
+  
+  <!-- Tailwind CSS -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+
+  <!-- AOS Animation Library -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <style>
+    /* Smoother Theme Transitions */
+    *:not(.star):not(.animate-ping):not(.animate-pulse):not(.progress-bar-fill) {
+      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* Dark/Light Mode Colors */
+    .gradient-bg {
+      background: linear-gradient(90deg, #7c3aed 0%, #9333ea 100%);
+      transition: background 0.5s ease;
+    }
+    
+    /* Light mode overrides (when dark mode is off) */
+    html:not(.dark) {
+      color-scheme: light;
+    }
+    
+    html:not(.dark) body {
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+    
+    html:not(.dark) .bg-gray-900 {
+      background-color: #f9fafb;
+    }
+    
+    html:not(.dark) .bg-gray-800 {
+      background-color: #f3f4f6;
+    }
+    
+    html:not(.dark) .bg-gray-700 {
+      background-color: #e5e7eb;
+    }
+    
+    html:not(.dark) .text-gray-100 {
+      color: #1f2937;
+    }
+    
+    html:not(.dark) .text-gray-300 {
+      color: #4b5563;
+    }
+    
+    html:not(.dark) .text-gray-400 {
+      color: #6b7280;
+    }
+    
+    html:not(.dark) .gradient-bg {
+      background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%);
+    }
+    
+    html:not(.dark) .bg-purple-600 {
+      background-color: #8b5cf6;
+    }
+    
+    html:not(.dark) .border-gray-700 {
+      border-color: #d1d5db;
+    }
+    
+    html:not(.dark) .highlight-card:hover {
+      box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4);
+    }
+    
+    html:not(.dark) .testimonial-card {
+      background: linear-gradient(to right, #eef2ff, #e0e7ff);
+    }
+    
+    html.dark .highlight-card:hover {
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+    }
+    
+    html.dark .testimonial-card {
+      background: linear-gradient(to right, #2f2f2f, #3b3b3b);
+    }
+
+    /* Card Hover Effects */
+    .highlight-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .highlight-card:hover {
+      transform: translateY(-10px) scale(1.02);
+    }
+    
+    .feature-card {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      border-color: #9333ea;
+    }
+    
+    .feature-card:hover .feature-icon {
+      transform: scale(1.15);
+    }
+    
+    .feature-icon {
+      transition: transform 0.3s ease;
+    }
+    
+    /* Star Animation Effect for Dark Mode Toggle */
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle 2s infinite;
+    }
+    
+    @keyframes twinkle {
+      0% { opacity: 0; transform: scale(0.1); }
+      50% { opacity: 0.8; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.1); }
+    }
+    
+    .theme-toggle-wrapper {
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+    
+    .theme-icon {
+      position: relative;
+      z-index: 5;
+      transition: transform 0.5s ease, color 0.5s ease;
+    }
+    
+    .theme-icon.sun {
+      color: #FFD700;
+      transform: rotate(180deg);
+    }
+    
+    .theme-icon.moon {
+      color: #C8A2C8;
+    }
+    
+    .theme-toggle-wrapper:hover .theme-icon {
+      transform: scale(1.2);
+    }
+    
+    /* Progress Bar Animation */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(124, 58, 237, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0;
+      transition: width 1s ease-in-out;
+      background-color: #9333ea;
+    }
+    
+    /* Dashboard Animation */
+    .dashboard-bg {
+      background: #1a1a2e;
+      border-radius: 12px;
+      box-shadow: 0 20px 30px -15px rgba(0,0,0,0.5);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .dashboard-bg:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 35px -12px rgba(0,0,0,0.6);
+    }
+    
+    .dashboard-topbar {
+      padding: 15px 20px;
+      background: #16213e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2a5a;
+    }
+    
+    .dashboard-notifications {
+      position: relative;
+    }
+    
+    .notification-dot {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      background-color: #ff5555;
+      border-radius: 50%;
+    }
+    
+    .dashboard-sidebar {
+      width: 70px;
+      background: #0f3460;
+      height: 100%;
+      padding-top: 20px;
+    }
+    
+    .sidebar-icon {
+      width: 38px;
+      height: 38px;
+      margin: 15px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-icon:hover, .sidebar-icon.active {
+      background: rgba(147, 51, 234, 0.5);
+    }
+    
+    .dashboard-main {
+      padding: 20px;
+      flex: 1;
+    }
+    
+    .dashboard-card {
+      background: rgba(22, 33, 62, 0.7);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-3px);
+    }
+    
+    .submission-activity {
+      height: 30px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .activity-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+    
+    .submission-pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: .3;
+      }
+    }
+    
+    .animate-ping {
+      animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    
+    @keyframes ping {
+      75%, 100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+    
+    /* Chart bars animation */
+    .chart-bar {
+      height: 80px;
+      width: 14px;
+      margin: 0 6px;
+      border-radius: 3px;
+      background: rgba(147, 51, 234, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .chart-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 20%;
+      background: rgba(255, 255, 255, 0.3);
+      animation: chartShine 3s infinite linear;
+    }
+    
+    @keyframes chartShine {
+      0% {
+        transform: translateY(-100%);
+      }
+      100% {
+        transform: translateY(400%);
+      }
+    }
+    
+    /* Mobile Menu */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 280px;
+      height: 100vh;
+      background: #1a1a2e;
+      z-index: 1000;
+      transition: right 0.3s ease;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+      padding: 20px;
+    }
+    
+    .mobile-menu.open {
+      right: 0;
+    }
+    
+    .menu-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+    
+    .menu-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* Responsive Timeline */
+    @media (max-width: 768px) {
+      .timeline-steps {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 30px;
+      }
+      
+      .timeline-step {
+        width: 100%;
+        margin-bottom: 40px;
+        position: relative;
+      }
+      
+      .timeline-circle {
+        position: absolute;
+        left: -40px;
+      }
+      
+      .timeline-line {
+        position: absolute;
+        left: -30px;
+        top: 0;
+        bottom: -40px;
+        width: 2px;
+        background: rgba(124, 58, 237, 0.5);
+      }
+      
+      .timeline-step:last-child .timeline-line {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body
+  class="
+    font-sans
+    text-gray-100
+    bg-gray-900
+    dark:bg-gray-900
+    dark:text-gray-100
+    min-h-screen
+    flex
+    flex-col
+  "
+>
+  <!-- Theme setup script -->
+  <script>
+    // On page load, best to add 'dark' class to <html> if localStorage or OS preference
+    if (
+      localStorage.getItem('theme') === 'dark' ||
+      (!('theme' in localStorage) &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="flex justify-between items-center mb-8">
+      <span class="text-2xl font-bold text-purple-400">ShelVey</span>
+      <button id="mobileMenuClose" class="text-gray-400 hover:text-white">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <div class="flex flex-col space-y-6">
+      <a href="#features" class="text-lg hover:text-purple-300">Features</a>
+      <a href="howitworks.html" class="text-lg hover:text-purple-300">How It Works</a>
+      <a href="#pricing" class="text-lg hover:text-purple-300">Pricing</a>
+      <a href="#testimonials" class="text-lg hover:text-purple-300">Testimonials</a>
+      <a href="#faq" class="text-lg hover:text-purple-300">FAQ</a>
+      <div class="pt-6 border-t border-gray-700">
+        <a href="#" class="block py-2 hover:text-purple-300">Log in</a>
+        <a
+          href="#"
+          class="mt-4 block px-4 py-2 bg-purple-600 text-white rounded-md text-center hover:bg-purple-700"
+        >
+          Get Started
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+
+  <!-- NAVBAR -->
+  <nav
+    class="
+      sticky
+      top-0
+      z-50
+      bg-gray-800
+      dark:bg-gray-800
+      dark:text-gray-100
+      shadow-md
+    "
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Left: Brand + Nav Links (Hidden on Mobile) -->
+        <div class="flex items-center space-x-8">
+          <span class="text-2xl font-bold text-purple-400">ShelVey</span>
+          <div class="hidden md:flex md:space-x-4">
+            <a href="#features" class="hover:text-purple-300">Features</a>
+            <a href="howitworks.html" class="hover:text-purple-300">How It Works</a>
+            <a href="#pricing" class="hover:text-purple-300">Pricing</a>
+            <a href="#testimonials" class="hover:text-purple-300">Testimonials</a>
+            <a href="#faq" class="hover:text-purple-300">FAQ</a>
+          </div>
+        </div>
+        
+        <!-- Right: Login & CTA + THEME TOGGLE SWITCH -->
+        <div class="flex items-center space-x-4">
+          <a
+            href="#"
+            class="text-sm font-medium hover:text-purple-300 hidden md:inline-block"
+          >
+            Log in
+          </a>
+          <a
+            href="#"
+            class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700"
+          >
+            Get Started
+          </a>
+
+          <!-- Theme Toggle Button -->
+          <div class="theme-toggle-wrapper hidden sm:block ml-2">
+            <button
+              id="themeToggle"
+              class="p-2 text-gray-100 theme-icon"
+              aria-label="Toggle Theme"
+            >
+              <i class="fas fa-moon"></i>
+            </button>
+            <div id="starContainer"></div>
+          </div>
+          
+          <!-- Mobile menu button -->
+          <button
+            id="mobileMenuButton"
+            class="md:hidden p-2 rounded-md text-gray-400 hover:text-white focus:outline-none"
+          >
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="relative bg-gray-900 dark:bg-gray-900 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <!-- Text Content -->
+        <div class="flex flex-col justify-center" data-aos="fade-right" data-aos-duration="1000">
+          <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight">
+            <span class="block">Automate Your Content</span>
+            <span class="block text-purple-400">Distribution &amp; Link Building</span>
+          </h1>
+          <p class="mt-6 text-gray-300 text-lg sm:text-xl max-w-2xl">
+            ShelVey automatically submits your content to 400+ high-authority platforms
+            while managing your backlinks, optimizing images, and fixing broken links—
+            all on autopilot. 
+          </p>
+          <div class="mt-8 flex flex-col sm:flex-row sm:space-x-4">
+            <a
+              href="#"
+              class="mb-3 sm:mb-0 inline-flex items-center justify-center px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition-all duration-300 transform hover:scale-105"
+            >
+              Start Free Trial
+            </a>
+            <a
+              href="howitworks.html"
+              class="inline-flex items-center justify-center px-8 py-3 border border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white font-medium rounded-md transition-all duration-300"
+            >
+              See How It Works
+            </a>
+          </div>
+        </div>
+
+        <!-- Interactive Dashboard -->
+        <div class="flex justify-center items-center" data-aos="zoom-in" data-aos-duration="1200">
+          <div class="dashboard-bg w-full max-w-lg">
+            <!-- Dashboard Top Bar -->
+            <div class="dashboard-topbar">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+              </div>
+              <div class="flex items-center space-x-4">
+                <div class="dashboard-search bg-gray-800 rounded-md px-3 py-1 flex items-center">
+                  <i class="fas fa-search text-gray-500 mr-2"></i>
+                  <span class="text-gray-500 text-sm">Search...</span>
+                </div>
+                <div class="dashboard-notifications relative">
+                  <i class="fas fa-bell text-gray-400"></i>
+                  <span class="notification-dot animate-ping"></span>
+                </div>
+                <div class="dashboard-user">
+                  <div class="w-8 h-8 bg-purple-700 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-medium">JD</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dashboard Content -->
+            <div class="flex">
+              <!-- Sidebar -->
+              <div class="dashboard-sidebar">
+                <div class="sidebar-icon active">
+                  <i class="fas fa-home text-white"></i>
+                </div>
+                <div class="sidebar-icon">
+                  <i class="fas fa-chart-bar text-gray-400"></i>
+                </div>
+                <div class="sidebar-icon">
+                  <i class="fas fa-link text-gray-400"></i>
+                </div>
+                <div class="sidebar-icon">
+                  <i class="fas fa-cog text-gray-400"></i>
+                </div>
+              </div>
+              
+              <!-- Main Content -->
+              <div class="dashboard-main">
+                <div class="flex justify-between items-center mb-6">
+                  <h2 class="text-xl font-semibold text-white">Submission Dashboard</h2>
+                  <button class="bg-purple-600 text-white text-sm px-3 py-1 rounded-md">
+                    + New Submission
+                  </button>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                  <div class="dashboard-card p-4">
+                    <h3 class="text-gray-400 text-sm mb-1">Active Submissions</h3>
+                    <div class="flex items-end">
+                      <span class="text-2xl font-bold text-white">147</span>
+                      <span class="ml-2 text-green-400 text-xs flex items-center">
+                        <i class="fas fa-arrow-up mr-1"></i>24%
+                      </span>
+                    </div>
+                  </div>
+                  <div class="dashboard-card p-4">
+                    <h3 class="text-gray-400 text-sm mb-1">Domain Authority</h3>
+                    <div class="flex items-end">
+                      <span class="text-2xl font-bold text-white">57</span>
+                      <span class="ml-2 text-green-400 text-xs flex items-center">
+                        <i class="fas fa-arrow-up mr-1"></i>12
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Active Submissions -->
+                <div class="dashboard-card p-4 mb-6">
+                  <h3 class="text-white font-medium mb-4">Recent Activity</h3>
+                  <div class="space-y-3">
+                    <div class="submission-activity">
+                      <div class="activity-icon bg-green-500">
+                        <i class="fas fa-check text-xs"></i>
+                      </div>
+                      <span class="text-sm">Submission to <b>Medium.com</b> completed</span>
+                    </div>
+                    <div class="submission-activity">
+                      <div class="activity-icon bg-purple-500">
+                        <div class="submission-pulse bg-purple-300 animate-pulse"></div>
+                      </div>
+                      <span class="text-sm">Processing <b>EzineArticles.com</b>...</span>
+                    </div>
+                    <div class="submission-activity">
+                      <div class="activity-icon bg-purple-500">
+                        <div class="submission-pulse bg-purple-300 animate-pulse"></div>
+                      </div>
+                      <span class="text-sm">Processing <b>LinkedIn.com</b>...</span>
+                    </div>
+                    <div class="submission-activity">
+                      <div class="activity-icon bg-yellow-500">
+                        <i class="fas fa-clock text-xs"></i>
+                      </div>
+                      <span class="text-sm">Queued for <b>15 directories</b></span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Chart -->
+                <div class="dashboard-card p-4">
+                  <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-white font-medium">Submission Performance</h3>
+                    <div class="text-xs text-gray-400">Last 7 days</div>
+                  </div>
+                  <div class="flex items-end justify-between h-80px mt-4">
+                    <div class="chart-bar" style="height: 40%"></div>
+                    <div class="chart-bar" style="height: 65%"></div>
+                    <div class="chart-bar" style="height: 45%"></div>
+                    <div class="chart-bar" style="height: 80%"></div>
+                    <div class="chart-bar" style="height: 60%"></div>
+                    <div class="chart-bar" style="height: 75%"></div>
+                    <div class="chart-bar" style="height: 90%"></div>
+                  </div>
+                  <div class="flex justify-between mt-2 text-xs text-gray-400">
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                    <span>Sun</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Background Accent (optional) -->
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-800 to-transparent pointer-events-none"></div>
+  </section>
+
+  <!-- QUICK STATS / METRICS SECTION -->
+  <section class="py-10 bg-gray-800 dark:bg-gray-800 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+        <div data-aos="fade-up" data-aos-delay="100">
+          <div class="counter-wrapper relative">
+            <p class="text-3xl font-bold text-purple-400 counter" data-target="400">0</p>
+            <span class="absolute text-xl font-bold text-purple-400 opacity-20" style="right:-10px;top:-5px">+</span>
+          </div>
+          <p class="mt-2 text-sm">High-Authority Platforms</p>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="200">
+          <div class="counter-wrapper relative">
+            <p class="text-3xl font-bold text-purple-400 counter" data-target="40">0</p>
+            <span class="absolute text-xl font-bold text-purple-400 opacity-20" style="right:-10px;top:-5px">+</span>
+          </div>
+          <p class="mt-2 text-sm">Hours Saved Weekly</p>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="300">
+          <div class="counter-wrapper relative">
+            <p class="text-3xl font-bold text-purple-400 counter" data-target="30">0</p>
+            <span class="absolute text-xl font-bold text-purple-400 opacity-20" style="right:-10px;top:-5px">%</span>
+          </div>
+          <p class="mt-2 text-sm">Avg DA Increase in 3-6 Months</p>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="400">
+          <div class="counter-wrapper relative">
+            <p class="text-3xl font-bold text-purple-400 counter" data-target="1000">0</p>
+            <span class="absolute text-xl font-bold text-purple-400 opacity-20" style="right:-10px;top:-5px">+</span>
+          </div>
+          <p class="mt-2 text-sm">Satisfied Clients</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF (LOGOS) -->
+  <div class="bg-gray-700 dark:bg-gray-700 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-gray-300 text-sm font-medium">TRUSTED BY COMPANIES WORLDWIDE</p>
+      <div class="mt-6 grid grid-cols-2 gap-8 md:grid-cols-6">
+        <div class="flex justify-center" data-aos="zoom-in" data-aos-delay="100">
+          <img
+            class="h-12 opacity-70 hover:opacity-100 transition-all duration-300"
+            src="https://via.placeholder.com/120x40?text=Logo1"
+            alt="Company logo"
+          />
+        </div>
+        <div class="flex justify-center" data-aos="zoom-in" data-aos-delay="150">
+          <img
+            class="h-12 opacity-70 hover:opacity-100 transition-all duration-300"
+            src="https://via.placeholder.com/120x40?text=Logo2"
+            alt="Company logo"
+          />
+        </div>
+        <div class="flex justify-center" data-aos="zoom-in" data-aos-delay="200">
+          <img
+            class="h-12 opacity-70 hover:opacity-100 transition-all duration-300"
+            src="https://via.placeholder.com/120x40?text=Logo3"
+            alt="Company logo"
+          />
+        </div>
+        <div class="flex justify-center" data-aos="zoom-in" data-aos-delay="250">
+          <img
+            class="h-12 opacity-70 hover:opacity-100 transition-all duration-300"
+            src="https://via.placeholder.com/120x40?text=Logo4"
+            alt="Company logo"
+          />
+        </div>
+        <div class="flex justify-center" data-aos="zoom-in" data-aos-delay="300">
+          <img
+            class="h-12 opacity-70 hover:opacity-100 transition-all duration-300"
+            src="https://via.placeholder.com/120x40?text=Logo5"
+            alt="Company logo"
+          />
+        </div>
+        <div class="flex justify-center" data-aos="zoom-in" data-aos-delay="350">
+          <img
+            class="h-12 opacity-70 hover:opacity-100 transition-all duration-300"
+            src="https://via.placeholder.com/120x40?text=Logo6"
+            alt="Company logo"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIGHLIGHTS SECTION -->
+  <section class="py-16 bg-gray-900 dark:bg-gray-900 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-purple-400 font-semibold tracking-wide uppercase" data-aos="fade-up">
+          THE SHELVEY ADVANTAGE
+        </h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight" data-aos="fade-up" data-aos-delay="100">
+          Why Marketers &amp; SEOs Choose ShelVey
+        </p>
+      </div>
+
+      <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Card 1 -->
+        <div class="highlight-card bg-gray-800 p-6 rounded-lg border border-gray-700" data-aos="flip-left" data-aos-delay="150">
+          <div class="-mt-6 flex items-center justify-center">
+            <div class="p-3 bg-purple-600 rounded-md shadow-lg">
+              <i class="fas fa-robot text-white text-2xl feature-icon"></i>
+            </div>
+          </div>
+          <h3 class="mt-4 text-lg font-medium">AI-Powered Automation</h3>
+          <p class="mt-2 text-gray-300">
+            Our AI handles submissions to 400+ platforms, saving you 40+ hours of tedious work
+            weekly while maximizing your link profile.
+          </p>
+          <p class="mt-3 text-sm text-purple-400">
+            <span id="automationRate">0</span>% automation success rate
+          </p>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="automationBar"></div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="highlight-card bg-gray-800 p-6 rounded-lg border border-gray-700" data-aos="flip-left" data-aos-delay="300">
+          <div class="-mt-6 flex items-center justify-center">
+            <div class="p-3 bg-purple-600 rounded-md shadow-lg">
+              <i class="fas fa-user-tie text-white text-2xl feature-icon"></i>
+            </div>
+          </div>
+          <h3 class="mt-4 text-lg font-medium">Human-Assisted Submissions</h3>
+          <p class="mt-2 text-gray-300">
+            Our expert team handles complex, high-DA platforms that require human touch, 
+            ensuring you get the most valuable backlinks.
+          </p>
+          <p class="mt-3 text-sm text-purple-400">
+            Access to <span id="platformCount">0</span>+ DA 90+ platforms
+          </p>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="platformBar"></div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="highlight-card bg-gray-800 p-6 rounded-lg border border-gray-700" data-aos="flip-left" data-aos-delay="450">
+          <div class="-mt-6 flex items-center justify-center">
+            <div class="p-3 bg-purple-600 rounded-md shadow-lg">
+              <i class="fas fa-tools text-white text-2xl feature-icon"></i>
+            </div>
+          </div>
+          <h3 class="mt-4 text-lg font-medium">Complete Link Management</h3>
+          <p class="mt-2 text-gray-300">
+            We don't just build links—we maintain them. Our system automatically monitors, 
+            fixes broken links, and optimizes existing content.
+          </p>
+          <p class="mt-3 text-sm text-purple-400">
+            Average <span id="healthImprovement">0</span>% improvement in link health
+          </p>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="healthBar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section id="features" class="py-16 bg-gray-800 dark:bg-gray-800 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-base text-purple-400 font-semibold tracking-wide uppercase" data-aos="fade-up">
+          POWERFUL FEATURES
+        </h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight" data-aos="fade-up" data-aos-delay="100">
+          Everything You Need For Content Distribution &amp; Link Building
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto" data-aos="fade-up" data-aos-delay="200">
+          Set it up once and let ShelVey handle the rest—from submission to optimization.
+        </p>
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Feature 1 -->
+        <div class="feature-card group p-6 rounded-lg border border-gray-700 bg-gray-900" data-aos="fade-up" data-aos-delay="150">
+          <div class="flex items-center mb-4">
+            <div class="p-3 bg-purple-600 rounded-md group-hover:bg-purple-500 transition-colors duration-300">
+              <i class="fas fa-globe text-white text-2xl feature-icon"></i>
+            </div>
+            <h3 class="ml-4 text-xl font-semibold">Multi-Platform Submission</h3>
+          </div>
+          <p class="text-gray-300">
+            Automatically distribute content across 400+ directories, article sites, PDF platforms, 
+            and social bookmarking services.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-400">
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Directory submissions (1000+ sites)
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Article platform distribution
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              PDF document sharing
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Social bookmarking automation
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="feature-card group p-6 rounded-lg border border-gray-700 bg-gray-900" data-aos="fade-up" data-aos-delay="300">
+          <div class="flex items-center mb-4">
+            <div class="p-3 bg-purple-600 rounded-md group-hover:bg-purple-500 transition-colors duration-300">
+              <i class="fas fa-link text-white text-2xl feature-icon"></i>
+            </div>
+            <h3 class="ml-4 text-xl font-semibold">Link Management</h3>
+          </div>
+          <p class="text-gray-300">
+            Stop worrying about broken or outdated links. ShelVey monitors and maintains your entire backlink profile.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-400">
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Automated broken link detection
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Smart link updating
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Internal link optimization
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Authority-based external linking
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card group p-6 rounded-lg border border-gray-700 bg-gray-900" data-aos="fade-up" data-aos-delay="450">
+          <div class="flex items-center mb-4">
+            <div class="p-3 bg-purple-600 rounded-md group-hover:bg-purple-500 transition-colors duration-300">
+              <i class="fas fa-image text-white text-2xl feature-icon"></i>
+            </div>
+            <h3 class="ml-4 text-xl font-semibold">Image Optimization</h3>
+          </div>
+          <p class="text-gray-300">
+            Maximize SEO value from images with automatic alt tag optimization and compression across all platforms.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-400">
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              SEO-optimized alt tags
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Image compression
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              File naming conventions
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Lazy-loading implementation
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card group p-6 rounded-lg border border-gray-700 bg-gray-900" data-aos="fade-up" data-aos-delay="150">
+          <div class="flex items-center mb-4">
+            <div class="p-3 bg-purple-600 rounded-md group-hover:bg-purple-500 transition-colors duration-300">
+              <i class="fas fa-chart-line text-white text-2xl feature-icon"></i>
+            </div>
+            <h3 class="ml-4 text-xl font-semibold">Performance Tracking</h3>
+          </div>
+          <p class="text-gray-300">
+            Comprehensive analytics dashboard showing your submission status, backlink health, and Domain Authority progress.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-400">
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Real-time submission tracking
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              DA/PA monitoring
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Traffic attribution
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Custom performance reports
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card group p-6 rounded-lg border border-gray-700 bg-gray-900" data-aos="fade-up" data-aos-delay="300">
+          <div class="flex items-center mb-4">
+            <div class="p-3 bg-purple-600 rounded-md group-hover:bg-purple-500 transition-colors duration-300">
+              <i class="fas fa-clock text-white text-2xl feature-icon"></i>
+            </div>
+            <h3 class="ml-4 text-xl font-semibold">Time-Saving Workflows</h3>
+          </div>
+          <p class="text-gray-300">
+            Create submission templates and schedules to maintain consistent content distribution without lifting a finger.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-400">
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Scheduled submissions
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Content templates
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Bulk operations
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Content recycling workflows
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card group p-6 rounded-lg border border-gray-700 bg-gray-900" data-aos="fade-up" data-aos-delay="450">
+          <div class="flex items-center mb-4">
+            <div class="p-3 bg-purple-600 rounded-md group-hover:bg-purple-500 transition-colors duration-300">
+              <i class="fas fa-user-shield text-white text-2xl feature-icon"></i>
+            </div>
+            <h3 class="ml-4 text-xl font-semibold">Human Quality Assurance</h3>
+          </div>
+          <p class="text-gray-300">
+            Our team provides manual verification for critical submissions, ensuring maximum effectiveness 
+            on premium platforms.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-400">
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Expert review for high-DA sites
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Content optimization assistance
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Anti-spam compliance
+            </li>
+            <li class="flex items-start feature-list-item" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+              <i class="fas fa-check text-green-400 mt-1 mr-2 opacity-0 transition-opacity duration-500"></i>
+              Platform-specific customization
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="py-16 bg-gray-900 dark:bg-gray-900 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-base text-purple-400 font-semibold tracking-wide uppercase" data-aos="fade-up">
+          HOW IT WORKS
+        </h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight" data-aos="fade-up" data-aos-delay="100">
+          Simple Setup, Powerful Results
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto" data-aos="fade-up" data-aos-delay="200">
+          Get started in minutes and let ShelVey handle days worth of manual work.
+        </p>
+      </div>
+
+      <!-- Responsive Timeline -->
+      <div class="mt-16 relative timeline-steps">
+        <!-- Steps -->
+        <div class="relative flex justify-between">
+          <!-- Step 1 -->
+          <div class="text-center w-1/4 px-2 timeline-step" data-aos="fade-right" data-aos-delay="150">
+            <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-purple-600 mx-auto timeline-circle">
+              <span class="text-white text-xl font-bold">1</span>
+            </span>
+            <div class="timeline-line"></div>
+            <h3 class="mt-4 text-lg font-medium">Connect Your Sites</h3>
+            <p class="mt-2 text-sm text-gray-300">
+              Add your websites and set content preferences in our dashboard.
+            </p>
+          </div>
+          <!-- Step 2 -->
+          <div class="text-center w-1/4 px-2 timeline-step" data-aos="fade-right" data-aos-delay="300">
+            <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-purple-600 mx-auto timeline-circle">
+              <span class="text-white text-xl font-bold">2</span>
+            </span>
+            <div class="timeline-line"></div>
+            <h3 class="mt-4 text-lg font-medium">Upload Content</h3>
+            <p class="mt-2 text-sm text-gray-300">
+              Upload your articles, PDFs, or images you want distributed.
+            </p>
+          </div>
+          <!-- Step 3 -->
+          <div class="text-center w-1/4 px-2 timeline-step" data-aos="fade-right" data-aos-delay="450">
+            <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-purple-600 mx-auto timeline-circle">
+              <span class="text-white text-xl font-bold">3</span>
+            </span>
+            <div class="timeline-line"></div>
+            <h3 class="mt-4 text-lg font-medium">Select Distribution</h3>
+            <p class="mt-2 text-sm text-gray-300">
+              Choose your target platforms or let ShelVey recommend the optimal mix.
+            </p>
+          </div>
+          <!-- Step 4 -->
+          <div class="text-center w-1/4 px-2 timeline-step" data-aos="fade-right" data-aos-delay="600">
+            <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-purple-600 mx-auto timeline-circle">
+              <span class="text-white text-xl font-bold">4</span>
+            </span>
+            <h3 class="mt-4 text-lg font-medium">Monitor Results</h3>
+            <p class="mt-2 text-sm text-gray-300">
+              Track submissions, link health, and DA improvements in real-time.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-20 text-center">
+        <div class="dashboard-bg inline-block rounded-lg shadow-xl" data-aos="zoom-in" data-aos-delay="200">
+          <!-- Dashboard visualization goes here - this would be similar to the one at the top 
+               but perhaps showing a different view focused on results -->
+          <div class="dashboard-topbar">
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+              <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+            <div class="flex items-center">
+              <span class="text-sm text-gray-400">Results Dashboard</span>
+            </div>
+          </div>
+          
+          <div class="p-6">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="dashboard-card p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="text-gray-400 text-sm">Submissions</h3>
+                  <span class="text-xs bg-green-800 text-green-300 px-2 py-1 rounded">Active</span>
+                </div>
+                <div class="flex items-end">
+                  <div class="relative" style="width:100%; height:60px">
+                    <div class="absolute bottom-0 left-0 right-0 bg-purple-900/30 rounded-sm" style="height:60px"></div>
+                    <div class="absolute bottom-0 left-0 bg-purple-600 rounded-sm" style="width:85%; height:60px"></div>
+                    <div class="absolute bottom-0 left-0 bg-purple-400 rounded-sm" style="width:65%; height:60px"></div>
+                    <div class="absolute bottom-0 left-0 bg-purple-300 rounded-sm" style="width:40%; height:60px"></div>
+                    <div class="absolute bottom-0 right-3 text-white text-xs">387</div>
+                  </div>
+                </div>
+                <div class="flex justify-between mt-2 text-xs text-gray-400">
+                  <span>Completed</span>
+                  <span>In Progress</span>
+                  <span>Queued</span>
+                </div>
+              </div>
+              <div class="dashboard-card p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="text-gray-400 text-sm">Domain Authority</h3>
+                  <span class="text-xs bg-green-800 text-green-300 px-2 py-1 rounded">+12</span>
+                </div>
+                <div class="flex items-center justify-center">
+                  <div class="relative inline-flex items-center justify-center">
+                    <svg class="w-24 h-24">
+                      <circle
+                        class="text-gray-700"
+                        stroke-width="8"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r="40"
+                        cx="50"
+                        cy="50"
+                      />
+                      <circle
+                        class="text-purple-500"
+                        stroke-width="8"
+                        stroke-dasharray="251.2"
+                        stroke-dashoffset="50.24"
+                        stroke-linecap="round"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r="40"
+                        cx="50"
+                        cy="50"
+                      />
+                    </svg>
+                    <span class="absolute text-xl font-semibold">64</span>
+                  </div>
+                </div>
+                <div class="flex justify-center mt-2 text-xs text-gray-400">
+                  <span>Starting: 52 • Current: 64</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="dashboard-card p-4">
+              <h3 class="text-white font-medium mb-4">Backlink Health</h3>
+              <div class="grid grid-cols-4 gap-3 mb-4">
+                <div class="p-3 bg-purple-900/30 rounded text-center">
+                  <div class="text-lg font-bold">1,286</div>
+                  <div class="text-xs text-gray-400">Total Links</div>
+                </div>
+                <div class="p-3 bg-green-900/30 rounded text-center">
+                  <div class="text-lg font-bold text-green-400">1,149</div>
+                  <div class="text-xs text-gray-400">Healthy</div>
+                </div>
+                <div class="p-3 bg-yellow-900/30 rounded text-center">
+                  <div class="text-lg font-bold text-yellow-400">98</div>
+                  <div class="text-xs text-gray-400">Redirects</div>
+                </div>
+                <div class="p-3 bg-red-900/30 rounded text-center">
+                  <div class="text-lg font-bold text-red-400">39</div>
+                  <div class="text-xs text-gray-400">Broken</div>
+                </div>
+              </div>
+              <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div class="flex h-full">
+                  <div class="bg-green-500 h-full" style="width:89%"></div>
+                  <div class="bg-yellow-500 h-full" style="width:8%"></div>
+                  <div class="bg-red-500 h-full" style="width:3%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING SECTION -->
+  <section id="pricing" class="py-16 bg-gray-800 dark:bg-gray-800 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-base text-purple-400 font-semibold tracking-wide uppercase" data-aos="fade-up">PRICING</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight" data-aos="fade-up" data-aos-delay="100">
+          Simple, Transparent Pricing
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto" data-aos="fade-up" data-aos-delay="200">
+          Choose the plan that works for your business needs.
+        </p>
+      </div>
+
+      <div class="mt-16 grid gap-8 lg:grid-cols-3 pricing-cards">
+        <!-- Basic Plan -->
+        <div class="flex flex-col rounded-lg shadow-lg overflow-hidden bg-gray-900 border border-gray-700 pricing-card" 
+             data-aos="fade-up" data-aos-delay="150">
+          <div class="px-6 py-8 sm:p-10 sm:pb-6">
+            <div>
+              <h3
+                class="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-purple-200 text-purple-800"
+              >
+                Basic
+              </h3>
+            </div>
+            <div class="mt-4 flex items-baseline text-6xl font-extrabold text-purple-400 price-animate">
+              <span class="price-value">$149</span>
+              <span class="ml-1 text-2xl font-medium text-gray-300">/month</span>
+            </div>
+            <p class="mt-5 text-lg text-gray-300">
+              Perfect for small businesses and solo entrepreneurs looking to build their online presence.
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 sm:p-10">
+            <ul class="space-y-4 pricing-features">
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>AI-powered submissions to 100+ platforms</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="150">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Human-assisted submissions to 5 premium platforms</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Up to 10 content pieces monthly</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="250">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Basic link monitoring</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>24-48 hour AI submission turnaround</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="350">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>3-5 business day human submission turnaround</p>
+              </li>
+            </ul>
+            <div class="rounded-md shadow mt-6" data-aos="zoom-in" data-aos-delay="400">
+              <a
+                href="#"
+                class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-md bg-purple-600 text-white hover:bg-purple-700 transform transition duration-300 hover:scale-105"
+              >
+                Get Started
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Plan -->
+        <div
+          class="relative flex flex-col rounded-lg shadow-lg overflow-hidden bg-gray-900 border-2 border-purple-500 scale-105 z-10 pricing-card-featured"
+          data-aos="fade-up" data-aos-delay="250"
+        >
+          <div class="px-6 py-8 sm:p-10 sm:pb-6">
+            <div class="flex items-center space-x-3">
+              <h3
+                class="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-purple-200 text-purple-800"
+              >
+                Professional
+              </h3>
+              <span
+                class="inline-flex px-4 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-purple-600 text-white"
+              >
+                MOST POPULAR
+              </span>
+            </div>
+            <div class="mt-4 flex items-baseline text-6xl font-extrabold text-purple-400 price-animate">
+              <span class="price-value">$299</span>
+              <span class="ml-1 text-2xl font-medium text-gray-300">/month</span>
+            </div>
+            <p class="mt-5 text-lg text-gray-300">
+              Ideal for growing businesses and marketing agencies looking to scale their link building efforts.
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 sm:p-10">
+            <ul class="space-y-4 pricing-features">
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>AI-powered submissions to 250+ platforms</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="150">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Human-assisted submissions to 15 premium platforms</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Up to 20 content pieces monthly</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="250">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Full link management (broken link fixing)</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Image alt tag optimization</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="350">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Priority support</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>12-24 hour AI submission turnaround</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="450">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>2-3 business day human submission turnaround</p>
+              </li>
+            </ul>
+            <div class="rounded-md shadow mt-6 relative" data-aos="zoom-in" data-aos-delay="500">
+              <span class="absolute -top-2 right-0 left-0 mx-auto text-center text-xs text-purple-300 bg-purple-900 rounded-full py-1 px-3 w-max">
+                Most Popular Choice
+              </span>
+              <a
+                href="#"
+                class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-md bg-purple-600 text-white hover:bg-purple-700 transform transition duration-300 hover:scale-105"
+              >
+                Get Started
+              </a>
+            </div>
+          </div>
+          <!-- Featured badge -->
+          <div class="absolute -top-5 -right-5 w-28 h-28 overflow-hidden">
+            <div class="absolute top-0 right-0 w-8 h-8 bg-purple-600 transform rotate-45 origin-bottom-left"></div>
+            <div class="absolute top-5 right-0 transform rotate-45 text-white text-xs font-bold py-1 px-4 bg-purple-700">
+              BEST VALUE
+            </div>
+          </div>
+        </div>
+
+        <!-- Enterprise Plan -->
+        <div class="flex flex-col rounded-lg shadow-lg overflow-hidden bg-gray-900 border border-gray-700 pricing-card"
+             data-aos="fade-up" data-aos-delay="350">
+          <div class="px-6 py-8 sm:p-10 sm:pb-6">
+            <div>
+              <h3
+                class="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-purple-200 text-purple-800"
+              >
+                Enterprise
+              </h3>
+            </div>
+            <div class="mt-4 flex items-baseline text-6xl font-extrabold text-purple-400 price-animate">
+              <span class="price-value">$749</span>
+              <span class="ml-1 text-2xl font-medium text-gray-300">/month</span>
+            </div>
+            <p class="mt-5 text-lg text-gray-300">
+              For large businesses and agencies that need maximum reach and comprehensive link management.
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 sm:p-10">
+            <ul class="space-y-4 pricing-features">
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="100">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>AI-powered submissions to 400+ platforms</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="150">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Human-assisted submissions to 30 premium platforms</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="200">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Up to 50 content pieces monthly</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="250">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Complete content optimization suite</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="300">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Custom distribution strategy</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="350">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>Dedicated account manager</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="400">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>6-12 hour AI submission turnaround</p>
+              </li>
+              <li class="flex items-start pricing-feature" data-aos="fade-right" data-aos-anchor-placement="center-bottom" data-aos-delay="450">
+                <i class="fas fa-check text-green-400 mt-1 mr-2"></i>
+                <p>1-2 business day human submission turnaround</p>
+              </li>
+            </ul>
+            <div class="rounded-md shadow mt-6" data-aos="zoom-in" data-aos-delay="500">
+              <a
+                href="#"
+                class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-md bg-purple-600 text-white hover:bg-purple-700 transform transition duration-300 hover:scale-105"
+              >
+                Get Started
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 text-center">
+        <p class="text-base text-gray-300" data-aos="fade-up" data-aos-delay="200">
+          All plans include a 14-day free trial. No credit card required.
+        </p>
+        <a href="#"
+          class="mt-2 inline-flex text-base font-medium text-purple-400 hover:text-purple-300 group transition duration-300"
+          data-aos="fade-up" data-aos-delay="300"
+        >
+          Need a custom plan? Contact us
+          <i class="fas fa-arrow-right ml-1 mt-1 transform group-hover:translate-x-1 transition duration-300"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" class="py-16 bg-gray-900 dark:bg-gray-900 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-base text-purple-400 font-semibold tracking-wide uppercase" data-aos="fade-up">
+          TESTIMONIALS
+        </h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight" data-aos="fade-up" data-aos-delay="100">
+          What Our Customers Say
+        </p>
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card rounded-lg p-8 text-gray-100 transform transition duration-500 hover:scale-105" 
+             data-aos="fade-up" data-aos-delay="150">
+          <div class="flex items-center">
+            <img
+              class="h-12 w-12 rounded-full object-cover border-2 border-purple-400"
+              src="https://via.placeholder.com/100x100"
+              alt="Sarah Johnson profile picture"
+            />
+            <div class="ml-4">
+              <h4 class="text-lg font-bold">Sarah J.</h4>
+              <p class="text-sm text-gray-300">Digital Marketing Manager</p>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex text-yellow-400">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="relative">
+              <i class="fas fa-quote-left text-purple-600 opacity-20 text-4xl absolute -top-2 -left-2"></i>
+              <p class="mt-3 text-gray-100 italic relative z-10 pl-3">
+                "ShelVey has transformed our link building strategy. What used to take my team weeks now happens
+                automatically. Our Domain Authority jumped from 38 to 52 in just three months of using the Professional plan."
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card rounded-lg p-8 text-gray-100 transform transition duration-500 hover:scale-105"
+             data-aos="fade-up" data-aos-delay="300">
+          <div class="flex items-center">
+            <img
+              class="h-12 w-12 rounded-full object-cover border-2 border-purple-400"
+              src="https://via.placeholder.com/100x100"
+              alt="Mark Thompson profile picture"
+            />
+            <div class="ml-4">
+              <h4 class="text-lg font-bold">Mark T.</h4>
+              <p class="text-sm text-gray-300">SEO Consultant</p>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex text-yellow-400">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="relative">
+              <i class="fas fa-quote-left text-purple-600 opacity-20 text-4xl absolute -top-2 -left-2"></i>
+              <p class="mt-3 text-gray-100 italic relative z-10 pl-3">
+                "I was skeptical that AI could handle directory submissions effectively, but ShelVey's hybrid approach 
+                is brilliant. The automated system handles the bulk while their team tackles high-value platforms that 
+                require finesse. My clients are seeing real results."
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card rounded-lg p-8 text-gray-100 transform transition duration-500 hover:scale-105"
+             data-aos="fade-up" data-aos-delay="450">
+          <div class="flex items-center">
+            <img
+              class="h-12 w-12 rounded-full object-cover border-2 border-purple-400"
+              src="https://via.placeholder.com/100x100"
+              alt="Elena Rodriguez profile picture"
+            />
+            <div class="ml-4">
+              <h4 class="text-lg font-bold">Elena R.</h4>
+              <p class="text-sm text-gray-300">E-commerce Director</p>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex text-yellow-400">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+            </div>
+            <div class="relative">
+              <i class="fas fa-quote-left text-purple-600 opacity-20 text-4xl absolute -top-2 -left-2"></i>
+              <p class="mt-3 text-gray-100 italic relative z-10 pl-3">
+                "The image optimization feature alone has been game-changing for our e-commerce site. ShelVey not only 
+                submits our content across platforms but maintains our existing assets. We've seen a 34% increase in 
+                organic traffic since implementing their system."
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Testimonial dots navigation -->
+      <div class="flex justify-center mt-8 space-x-2">
+        <button class="w-3 h-3 rounded-full bg-purple-600"></button>
+        <button class="w-3 h-3 rounded-full bg-gray-600 hover:bg-purple-500 transition"></button>
+        <button class="w-3 h-3 rounded-full bg-gray-600 hover:bg-purple-500 transition"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ SECTION with interactive toggles -->
+  <section id="faq" class="py-16 bg-gray-800 dark:bg-gray-800 text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-base text-purple-400 font-semibold tracking-wide uppercase" data-aos="fade-up">FAQ</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight" data-aos="fade-up" data-aos-delay="100">
+          Frequently Asked Questions
+        </p>
+      </div>
+
+      <div class="mt-12 max-w-3xl mx-auto">
+        <dl class="space-y-6 faq-container">
+          <!-- Question 1 -->
+          <div class="pt-6 faq-item" data-aos="fade-up" data-aos-delay="150">
+            <dt class="text-lg">
+              <button
+                class="text-left w-full flex justify-between items-start focus:outline-none faq-button"
+              >
+                <span class="font-medium">Is this white hat SEO?</span>
+                <span class="ml-6 h-7 flex items-center">
+                  <i class="fas fa-plus-circle text-purple-400 transform rotate-0 transition-transform duration-300 faq-icon"></i>
+                </span>
+              </button>
+            </dt>
+            <dd class="mt-2 pr-12 hidden faq-answer">
+              <p class="text-base text-gray-300">
+                Absolutely. ShelVey follows all best practices for content distribution. We don't engage in
+                manipulative tactics. We distribute valuable content to relevant platforms, maintain link health,
+                and ensure everything complies with platform guidelines. Our human QA team reviews submissions to
+                premium platforms to ensure quality.
+              </p>
+            </dd>
+          </div>
+
+          <!-- Question 2 -->
+          <div class="pt-6 faq-item" data-aos="fade-up" data-aos-delay="200">
+            <dt class="text-lg">
+              <button
+                class="text-left w-full flex justify-between items-start focus:outline-none faq-button"
+              >
+                <span class="font-medium">How much time will this save me?</span>
+                <span class="ml-6 h-7 flex items-center">
+                  <i class="fas fa-plus-circle text-purple-400 transform rotate-0 transition-transform duration-300 faq-icon"></i>
+                </span>
+              </button>
+            </dt>
+            <dd class="mt-2 pr-12 hidden faq-answer">
+              <p class="text-base text-gray-300">
+                On average, our customers report saving 30-40 hours per week that would otherwise be spent on manual
+                submissions and link maintenance. For a typical marketing team, that translates to freeing up nearly
+                one full-time employee's worth of hours. The Professional plan automates approximately 90% of the
+                submission process.
+              </p>
+            </dd>
+          </div>
+
+          <!-- Question 3 -->
+          <div class="pt-6 faq-item" data-aos="fade-up" data-aos-delay="250">
+            <dt class="text-lg">
+              <button
+                class="text-left w-full flex justify-between items-start focus:outline-none faq-button"
+              >
+                <span class="font-medium">What kind of results can I expect?</span>
+                <span class="ml-6 h-7 flex items-center">
+                  <i class="fas fa-plus-circle text-purple-400 transform rotate-0 transition-transform duration-300 faq-icon"></i>
+                </span>
+              </button>
+            </dt>
+            <dd class="mt-2 pr-12 hidden faq-answer">
+              <p class="text-base text-gray-300">
+                Results vary based on your starting point and content quality, but our average customer sees a 
+                15-30% increase in Domain Authority within 3-6 months. More importantly, they experience increases 
+                in referral traffic, improved SERP rankings, and better overall link health. For best results, 
+                we recommend consistent content submissions over at least 4-6 months.
+              </p>
+            </dd>
+          </div>
+
+          <!-- Question 4 -->
+          <div class="pt-6 faq-item" data-aos="fade-up" data-aos-delay="300">
+            <dt class="text-lg">
+              <button
+                class="text-left w-full flex justify-between items-start focus:outline-none faq-button"
+              >
+                <span class="font-medium">Do I need to create content specifically for submissions?</span>
+                <span class="ml-6 h-7 flex items-center">
+                  <i class="fas fa-plus-circle text-purple-400 transform rotate-0 transition-transform duration-300 faq-icon"></i>
+                </span>
+              </button>
+            </dt>
+            <dd class="mt-2 pr-12 hidden faq-answer">
+              <p class="text-base text-gray-300">
+                Not necessarily. You can repurpose existing content from your website or blog. Our system optimizes
+                your content for each platform automatically. However, for best results, we recommend creating
+                some platform-specific content. Our team can provide guidance on content strategy to maximize your
+                submissions.
+              </p>
+            </dd>
+          </div>
+
+          <!-- Question 5 -->
+          <div class="pt-6 faq-item" data-aos="fade-up" data-aos-delay="350">
+            <dt class="text-lg">
+              <button
+                class="text-left w-full flex justify-between items-start focus:outline-none faq-button"
+              >
+                <span class="font-medium">How does the human-assisted submission work?</span>
+                <span class="ml-6 h-7 flex items-center">
+                  <i class="fas fa-plus-circle text-purple-400 transform rotate-0 transition-transform duration-300 faq-icon"></i>
+                </span>
+              </button>
+            </dt>
+            <dd class="mt-2 pr-12 hidden faq-answer">
+              <p class="text-base text-gray-300">
+                Our team of SEO specialists manually handles submissions to high-value platforms that either
+                have complex submission requirements or strict anti-automation measures. They customize your
+                content for each platform, ensure proper categorization, and follow up on any verification
+                processes. This hybrid approach ensures you get the benefits of both automation efficiency
+                and human expertise.
+              </p>
+            </dd>
+          </div>
+
+          <!-- Question 6 -->
+          <div class="pt-6 faq-item" data-aos="fade-up" data-aos-delay="400">
+            <dt class="text-lg">
+              <button
+                class="text-left w-full flex justify-between items-start focus:outline-none faq-button"
+              >
+                <span class="font-medium">Can I cancel anytime?</span>
+                <span class="ml-6 h-7 flex items-center">
+                  <i class="fas fa-plus-circle text-purple-400 transform rotate-0 transition-transform duration-300 faq-icon"></i>
+                </span>
+              </button>
+            </dt>
+            <dd class="mt-2 pr-12 hidden faq-answer">
+              <p class="text-base text-gray-300">
+                Yes, you can cancel your subscription at any time. There are no long-term contracts or 
+                cancellation fees. However, most of our customers see the best results after 4-6 months 
+                of consistent use as search engines need time to index and value the new backlinks.
+              </p>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="gradient-bg py-16 relative overflow-hidden">
+    <!-- Animated background particles -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="particle-container"></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center text-gray-50">
+        <h2 class="text-3xl font-extrabold sm:text-4xl" data-aos="fade-up">
+          Ready to transform your link building strategy?
+        </h2>
+        <p class="mt-4 text-lg leading-6 text-purple-100" data-aos="fade-up" data-aos-delay="100">
+          Join hundreds of businesses saving time and boosting their Domain Authority with ShelVey.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div class="inline-flex rounded-md shadow" data-aos="fade-right" data-aos-delay="200">
+            <a
+              href="#"
+              class="inline-flex items-center justify-center px-5 py-3 text-base font-medium rounded-md bg-white text-purple-600 hover:bg-purple-100 transform transition duration-300 hover:scale-105"
+            >
+              Start Your Free Trial
+              <svg class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+              </svg>
+            </a>
+          </div>
+          <div class="inline-flex" data-aos="fade-left" data-aos-delay="300">
+            <a
+              href="#"
+              class="inline-flex items-center justify-center px-5 py-3 text-base font-medium rounded-md border border-transparent text-white bg-purple-800 bg-opacity-60 hover:bg-opacity-70 transform transition duration-300 hover:scale-105"
+            >
+              <i class="fas fa-calendar-check mr-2"></i>
+              Schedule Demo
+            </a>
+          </div>
+        </div>
+        
+        <!-- Animated countdown timer for limited-time offer -->
+        <div class="mt-10 inline-block bg-purple-900 bg-opacity-60 rounded-lg p-4 mx-auto" data-aos="zoom-in" data-aos-delay="400">
+          <p class="text-sm text-purple-200 mb-2">Limited Time Offer: 20% off all annual plans</p>
+          <div class="flex space-x-4 justify-center text-white">
+            <div class="flex flex-col items-center">
+              <div class="bg-purple-800 rounded-md w-12 h-12 flex items-center justify-center text-xl font-bold countdown-days">00</div>
+              <span class="text-xs mt-1">Days</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="bg-purple-800 rounded-md w-12 h-12 flex items-center justify-center text-xl font-bold countdown-hours">00</div>
+              <span class="text-xs mt-1">Hours</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="bg-purple-800 rounded-md w-12 h-12 flex items-center justify-center text-xl font-bold countdown-minutes">00</div>
+              <span class="text-xs mt-1">Minutes</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="bg-purple-800 rounded-md w-12 h-12 flex items-center justify-center text-xl font-bold countdown-seconds">00</div>
+              <span class="text-xs mt-1">Seconds</span>
+            </div>
+          </div>
+          <p class="text-xs text-purple-200 mt-2">Use code: <span class="font-mono font-bold">SHELVEY20</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 dark:bg-gray-900 text-gray-100 mt-auto">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Company Info -->
+        <div class="col-span-1">
+          <span class="text-2xl font-bold text-purple-400">ShelVey</span>
+          <p class="mt-2 text-sm text-gray-300">
+            Automating content distribution and link building for businesses of all sizes.
+          </p>
+          <div class="mt-6 flex space-x-6">
+            <a href="#" class="text-gray-400 hover:text-gray-300 transform hover:scale-110 transition duration-300">
+              <i class="fab fa-twitter text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-gray-300 transform hover:scale-110 transition duration-300">
+              <i class="fab fa-facebook text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-gray-300 transform hover:scale-110 transition duration-300">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-gray-300 transform hover:scale-110 transition duration-300">
+              <i class="fab fa-linkedin text-xl"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-span-1">
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Quick Links</h3>
+          <ul class="mt-4 space-y-4">
+            <li>
+              <a href="#features" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                Features
+              </a>
+            </li>
+            <li>
+              <a href="howitworks.html" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                How It Works
+              </a>
+            </li>
+            <li>
+              <a href="#pricing" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                Pricing
+              </a>
+            </li>
+            <li>
+              <a href="#testimonials" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                Testimonials
+              </a>
+            </li>
+            <li>
+              <a href="#faq" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                FAQ
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="col-span-1">
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Resources</h3>
+          <ul class="mt-4 space-y-4">
+            <li>
+              <a href="#" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                Blog
+              </a>
+            </li>
+            <li>
+              <a href="#" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                Knowledge Base
+              </a>
+            </li>
+            <li>
+              <a href="#" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                Case Studies
+              </a>
+            </li>
+            <li>
+              <a href="#" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                Webinars
+              </a>
+            </li>
+            <li>
+              <a href="#" class="text-base text-gray-300 hover:text-white transition duration-300 inline-flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-2 text-purple-400"></i>
+                API Documentation
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Company + Newsletter -->
+        <div class="col-span-1">
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Stay Updated</h3>
+          <p class="mt-4 text-sm text-gray-300">Get the latest news and tips delivered to your inbox.</p>
+          <form class="mt-4 sm:flex sm:max-w-md">
+            <label for="email-address" class="sr-only">Email address</label>
+            <input type="email" name="email-address" id="email-address" autocomplete="email" required 
+              class="appearance-none min-w-0 w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-4 text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" 
+              placeholder="Enter your email">
+            <div class="mt-3 rounded-md sm:mt-0 sm:ml-3 sm:flex-shrink-0">
+              <button type="submit" 
+                class="w-full bg-purple-600 flex items-center justify-center border border-transparent rounded-md py-2 px-4 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                Subscribe
+              </button>
+            </div>
+          </form>
+          <div class="mt-6">
+            <h4 class="text-sm font-semibold text-gray-400">Follow Us</h4>
+            <div class="mt-2 flex space-x-4">
+              <a href="#" class="text-gray-400 hover:text-purple-400 transition">
+                <i class="fab fa-discord text-lg"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-purple-400 transition">
+                <i class="fab fa-github text-lg"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-purple-400 transition">
+                <i class="fab fa-youtube text-lg"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-purple-400 transition">
+                <i class="fab fa-reddit text-lg"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bottom section with copyright and links -->
+      <div class="mt-12 border-t border-gray-700 pt-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <p class="text-base text-gray-400">
+            &copy; 2025 ShelVey. All rights reserved.
+          </p>
+          <div class="mt-4 md:mt-0 flex space-x-6">
+            <a href="#" class="text-sm text-gray-400 hover:text-gray-300">Privacy Policy</a>
+            <a href="#" class="text-sm text-gray-400 hover:text-gray-300">Terms of Service</a>
+            <a href="#" class="text-sm text-gray-400 hover:text-gray-300">Cookie Policy</a>
+            <a href="#" class="text-sm text-gray-400 hover:text-gray-300">Contact</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Back to top button -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform transition duration-300 translate-y-20 opacity-0">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+  </footer>
+
+  <!-- Cookie consent -->
+  <div id="cookieConsent" class="fixed bottom-0 left-0 right-0 bg-gray-800 shadow-lg transform translate-y-full transition-transform duration-500 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 md:flex md:items-center md:justify-between">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm text-gray-300">
+          We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
+        </p>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-6">
+        <button id="cookieSettings" class="mr-3 flex-shrink-0 rounded-md px-3 py-1 text-sm text-gray-300 border border-gray-600 hover:bg-gray-700">
+          Cookie Settings
+        </button>
+        <button id="acceptCookies" class="flex-shrink-0 rounded-md bg-purple-600 px-3 py-1 text-sm font-medium text-white hover:bg-purple-700">
+          Accept All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load AOS Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  
+  <!-- JS: All functionality -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize AOS animations
+      AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100,
+        delay: 100
+      });
+      
+      // =====================
+      // Mobile menu functionality
+      // =====================
+      const mobileMenuButton = document.getElementById('mobileMenuButton');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const menuBackdrop = document.getElementById('menuBackdrop');
+      const mobileMenuClose = document.getElementById('mobileMenuClose');
+      
+      if (mobileMenuButton) {
+        mobileMenuButton.addEventListener('click', () => {
+          mobileMenu.classList.add('open');
+          menuBackdrop.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+      }
+      
+      if (mobileMenuClose) {
+        mobileMenuClose.addEventListener('click', closeMenu);
+      }
+      
+      if (menuBackdrop) {
+        menuBackdrop.addEventListener('click', closeMenu);
+      }
+      
+      function closeMenu() {
+        mobileMenu.classList.remove('open');
+        menuBackdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      
+      // Close mobile menu when clicking on links
+      const mobileLinks = mobileMenu.querySelectorAll('a');
+      mobileLinks.forEach(link => {
+        link.addEventListener('click', closeMenu);
+      });
+      
+      // =====================
+      // FAQ toggles
+      // =====================
+      const faqButtons = document.querySelectorAll('.faq-button');
+      faqButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const faqItem = button.closest('.faq-item');
+          const answer = faqItem.querySelector('.faq-answer');
+          const icon = button.querySelector('.faq-icon');
+          
+          // Close all others first
+          document.querySelectorAll('.faq-answer').forEach(item => {
+            if (item !== answer && !item.classList.contains('hidden')) {
+              item.classList.add('hidden');
+              const otherIcon = item.closest('.faq-item').querySelector('.faq-icon');
+              otherIcon.classList.remove('fa-minus-circle', 'rotate-180');
+              otherIcon.classList.add('fa-plus-circle', 'rotate-0');
+            }
+          });
+          
+          // Toggle current one
+          if (answer.classList.contains('hidden')) {
+            answer.classList.remove('hidden');
+            // Slide down animation
+            answer.style.maxHeight = '0';
+            answer.style.opacity = '0';
+            answer.style.transition = 'max-height 0.5s ease, opacity 0.3s ease';
+            answer.style.overflow = 'hidden';
+            setTimeout(() => {
+              answer.style.maxHeight = answer.scrollHeight + 'px';
+              answer.style.opacity = '1';
+            }, 10);
+            
+            // Icon animation
+            icon.classList.remove('fa-plus-circle', 'rotate-0');
+            icon.classList.add('fa-minus-circle', 'rotate-180');
+          } else {
+            // Slide up animation
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+            setTimeout(() => {
+              answer.style.maxHeight = '0';
+              answer.style.opacity = '0';
+            }, 10);
+            
+            setTimeout(() => {
+              answer.classList.add('hidden');
+              answer.style.maxHeight = '';
+              answer.style.opacity = '';
+            }, 500);
+            
+            // Icon animation
+            icon.classList.remove('fa-minus-circle', 'rotate-180');
+            icon.classList.add('fa-plus-circle', 'rotate-0');
+          }
+        });
+      });
+      
+      // =====================
+      // Theme toggle with animation
+      // =====================
+      const themeToggleButton = document.getElementById('themeToggle');
+      const starContainer = document.getElementById('starContainer');
+      
+      if (themeToggleButton) {
+        themeToggleButton.addEventListener('click', () => {
+          // Apply transitions
+          document.documentElement.classList.toggle('dark');
+          const icon = themeToggleButton.querySelector('i');
+          
+          if (document.documentElement.classList.contains('dark')) {
+            // Switch to dark mode
+            localStorage.setItem('theme', 'dark');
+            icon.classList.remove('fa-sun', 'sun');
+            setTimeout(() => {
+              icon.classList.add('fa-moon', 'moon');
+            }, 250);
+            createStars();
+          } else {
+            // Switch to light mode
+            localStorage.setItem('theme', 'light');
+            icon.classList.remove('fa-moon', 'moon');
+            setTimeout(() => {
+              icon.classList.add('fa-sun', 'sun');
+            }, 250);
+            starContainer.innerHTML = '';
+          }
+        });
+      }
+      
+      // Create stars for dark mode
+      function createStars() {
+        if (!starContainer) return;
+        
+        starContainer.innerHTML = '';
+        if (document.documentElement.classList.contains('dark')) {
+          for (let i = 0; i < 12; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            const size = Math.random() * 3 + 1;
+            const left = Math.random() * 60 - 10;
+            const top = Math.random() * 60 - 10;
+            const delay = Math.random() * 2;
+            
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.left = `${left}px`;
+            star.style.top = `${top}px`;
+            star.style.animationDelay = `${delay}s`;
+            
+            starContainer.appendChild(star);
+          }
+        }
+      }
+      
+      // Initialize stars
+      createStars();
+      
+      // Initialize dark/light mode icon
+      if (themeToggleButton) {
+        const icon = themeToggleButton.querySelector('i');
+        if (document.documentElement.classList.contains('dark')) {
+          icon.classList.remove('fa-sun', 'sun');
+          icon.classList.add('fa-moon', 'moon');
+        } else {
+          icon.classList.remove('fa-moon', 'moon');
+          icon.classList.add('fa-sun', 'sun');
+        }
+      }
+      
+      // =====================
+      // Animated counters
+      // =====================
+      const counters = document.querySelectorAll('.counter');
+      
+      function animateCounter(counter, endValue, duration = 2000) {
+        let startValue = 0;
+        const increment = Math.ceil(endValue / (duration / 16));
+        
+        function updateCounter() {
+          startValue += increment;
+          if (startValue > endValue) {
+            counter.textContent = endValue;
+          } else {
+            counter.textContent = startValue;
+            requestAnimationFrame(updateCounter);
+          }
+        }
+        
+        updateCounter();
+      }
+      
+      function handleCounterIntersection(entries, observer) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const counter = entry.target;
+            const endValue = parseInt(counter.getAttribute('data-target'));
+            animateCounter(counter, endValue);
+            observer.unobserve(counter);
+          }
+        });
+      }
+      
+      const counterObserver = new IntersectionObserver(handleCounterIntersection, {
+        threshold: 0.5
+      });
+      
+      counters.forEach(counter => {
+        counterObserver.observe(counter);
+      });
+      
+      // =====================
+      // Progress Bar Animations
+      // =====================
+      function animateProgressBar(bar, percentage) {
+        bar.style.width = `${percentage}%`;
+      }
+      
+      function handleProgressIntersection(entries, observer) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Highlight cards
+            if (entry.target.id === 'automationBar') {
+              const percentSpan = document.getElementById('automationRate');
+              animateProgressBar(entry.target, 93);
+              
+              let value = 0;
+              const intervalId = setInterval(() => {
+                value += 1;
+                if (value > 93) {
+                  clearInterval(intervalId);
+                } else {
+                  percentSpan.textContent = value;
+                }
+              }, 20);
+            }
+            else if (entry.target.id === 'platformBar') {
+              const countSpan = document.getElementById('platformCount');
+              animateProgressBar(entry.target, 30/40*100); // 30 out of max 40
+              
+              let value = 0;
+              const intervalId = setInterval(() => {
+                value += 1;
+                if (value > 30) {
+                  clearInterval(intervalId);
+                } else {
+                  countSpan.textContent = value;
+                }
+              }, 60);
+            }
+            else if (entry.target.id === 'healthBar') {
+              const percentSpan = document.getElementById('healthImprovement');
+              animateProgressBar(entry.target, 26);
+              
+              let value = 0;
+              const intervalId = setInterval(() => {
+                value += 1;
+                if (value > 26) {
+                  clearInterval(intervalId);
+                } else {
+                  percentSpan.textContent = value;
+                }
+              }, 70);
+            }
+            
+            observer.unobserve(entry.target);
+          }
+        });
+      }
+      
+      const progressObserver = new IntersectionObserver(handleProgressIntersection, {
+        threshold: 0.5
+      });
+      
+      const progressBars = document.querySelectorAll('.progress-bar-fill');
+      progressBars.forEach(bar => {
+        progressObserver.observe(bar);
+      });
+      
+      // =====================
+      // Feature list animations
+      // =====================
+      function handleFeatureIntersection(entries, observer) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const icon = entry.target.querySelector('i');
+            icon.classList.add('opacity-100');
+            observer.unobserve(entry.target);
+          }
+        });
+      }
+      
+      const featureObserver = new IntersectionObserver(handleFeatureIntersection, {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+      });
+      
+      const featureItems = document.querySelectorAll('.feature-list-item');
+      featureItems.forEach(item => {
+        featureObserver.observe(item);
+      });
+      
+      // =====================
+      // Back to top button
+      // =====================
+      const backToTopButton = document.getElementById('backToTop');
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) {
+          backToTopButton.classList.remove('translate-y-20', 'opacity-0');
+          backToTopButton.classList.add('translate-y-0', 'opacity-100');
+        } else {
+          backToTopButton.classList.add('translate-y-20', 'opacity-0');
+          backToTopButton.classList.remove('translate-y-0', 'opacity-100');
+        }
+      });
+      
+      backToTopButton.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // =====================
+      // Cookie consent
+      // =====================
+      const cookieConsent = document.getElementById('cookieConsent');
+      const acceptCookies = document.getElementById('acceptCookies');
+      const cookieSettings = document.getElementById('cookieSettings');
+      
+      // Show cookie consent if not accepted
+      if (!localStorage.getItem('cookiesAccepted')) {
+        setTimeout(() => {
+          cookieConsent.classList.remove('translate-y-full');
+        }, 1500);
+      }
+      
+      acceptCookies.addEventListener('click', () => {
+        localStorage.setItem('cookiesAccepted', 'true');
+        cookieConsent.classList.add('translate-y-full');
+      });
+      
+      cookieSettings.addEventListener('click', () => {
+        // Implement cookie settings modal if needed
+        alert('Cookie settings would open here.');
+      });
+      
+      // =====================
+      // Countdown timer
+      // =====================
+      function updateCountdown() {
+        const now = new Date();
+        // Set end date to 7 days from now
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 7);
+        
+        const diff = endDate - now;
+        
+        // Calculate days, hours, minutes, seconds
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        // Update DOM
+        document.querySelector('.countdown-days').textContent = days.toString().padStart(2, '0');
+        document.querySelector('.countdown-hours').textContent = hours.toString().padStart(2, '0');
+        document.querySelector('.countdown-minutes').textContent = minutes.toString().padStart(2, '0');
+        document.querySelector('.countdown-seconds').textContent = seconds.toString().padStart(2, '0');
+      }
+      
+      // Initialize countdown
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+      
+      // =====================
+      // Pricing card hover effects
+      // =====================
+      const pricingCards = document.querySelectorAll('.pricing-card');
+      
+      pricingCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          if (!card.classList.contains('pricing-card-featured')) {
+            card.style.transform = 'translateY(-10px)';
+            card.style.boxShadow = '0 20px 25px -5px rgba(124, 58, 237, 0.25)';
+            card.style.borderColor = 'rgb(147, 51, 234)';
+          }
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          if (!card.classList.contains('pricing-card-featured')) {
+            card.style.transform = '';
+            card.style.boxShadow = '';
+            card.style.borderColor = '';
+          }
+        });
+      });
+      
+      // =====================
+      // Create particle effect for CTA section
+      // =====================
+      const particleContainer = document.querySelector('.particle-container');
+      
+      if (particleContainer) {
+        for (let i = 0; i < 50; i++) {
+          createParticle();
+        }
+      }
+      
+      function createParticle() {
+        const particle = document.createElement('div');
+        const size = Math.random() * 5 + 1;
+        
+        particle.style.position = 'absolute';
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.background = 'rgba(255, 255, 255, 0.5)';
+        particle.style.borderRadius = '50%';
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.filter = 'blur(1px)';
+        
+        // Animation
+        particle.style.animation = `
+          floatParticle ${Math.random() * 10 + 10}s linear infinite,
+          pulseParticle ${Math.random() * 4 + 2}s ease-in-out infinite
+        `;
+        
+        particleContainer.appendChild(particle);
+      }
+      
+      // Add animation styles
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes floatParticle {
+          0% {
+            transform: translateY(0) translateX(0);
+          }
+          25% {
+            transform: translateY(-${Math.random() * 50 + 10}px) translateX(${Math.random() * 30 - 15}px);
+          }
+          50% {
+            transform: translateY(-${Math.random() * 80 + 20}px) translateX(${Math.random() * 30 - 15}px);
+          }
+          75% {
+            transform: translateY(-${Math.random() * 50 + 10}px) translateX(${Math.random() * 30 - 15}px);
+          }
+          100% {
+            transform: translateY(0) translateX(0);
+          }
+        }
+        @keyframes pulseParticle {
+          0%, 100% {
+            opacity: 0.2;
+          }
+          50% {
+            opacity: 0.8;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // =====================
+      // Price animation on toggle (annual/monthly)
+      // =====================
+      // Let's add this functionality to allow for price toggle in the future
+      const priceValues = document.querySelectorAll('.price-value');
+      let isAnnual = false; // Default to monthly
+      
+      // This would connect to a toggle button if we had one
+      function togglePricing() {
+        isAnnual = !isAnnual;
+        
+        // Apply animations and update prices
+        priceValues.forEach(price => {
+          // Add animation class
+          price.classList.add('animate-bounce');
+          
+          // Get current price and calculate annual (20% discount)
+          const currentPrice = parseInt(price.textContent.replace('$', ''));
+          let newPrice;
+          
+          if (isAnnual) {
+            newPrice = Math.round(currentPrice * 12 * 0.8); // 20% annual discount
+          } else {
+            newPrice = Math.round((currentPrice / 12) / 0.8); // Convert back to monthly
+          }
+          
+          // Update price after animation
+          setTimeout(() => {
+            price.textContent = `$${newPrice}`;
+            price.classList.remove('animate-bounce');
+          }, 300);
+        });
+      }
+      
+      // Call this when we want to toggle pricing (would connect to a UI element)
+      // For demo purposes only - you'd connect this to a real toggle
+      // togglePricing();
+      
+      // =====================
+      // Smooth scrolling for anchor links
+      // =====================
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            // Add offset for fixed header
+            const headerOffset = 80;
+            const elementPosition = targetElement.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+            
+            // Update URL without page reload
+            history.pushState(null, null, targetId);
+          }
+        });
+      });
+      
+      // =====================
+      // Show dashboard activity animations
+      // =====================
+      // This makes the dashboard more dynamic with timed updates
+      function animateDashboardActivity() {
+        // Simulate new activity in dashboard
+        const activityItems = document.querySelectorAll('.submission-activity');
+        if (!activityItems.length) return;
+        
+        // Random activity updates
+        setInterval(() => {
+          const randomIndex = Math.floor(Math.random() * activityItems.length);
+          const item = activityItems[randomIndex];
+          
+          // Briefly highlight the item
+          item.classList.add('bg-purple-900', 'bg-opacity-25');
+          setTimeout(() => {
+            item.classList.remove('bg-purple-900', 'bg-opacity-25');
+          }, 1500);
+          
+          // Update the text occasionally
+          if (Math.random() > 0.7) {
+            const platforms = [
+              'LinkedIn.com',
+              'Medium.com', 
+              'ArticleBase.com',
+              'SooperArticles.com',
+              'EzineArticles.com',
+              'Issuu.com',
+              'Scribd.com',
+              'HubPages.com'
+            ];
+            const randomPlatform = platforms[Math.floor(Math.random() * platforms.length)];
+            const statuses = ['Processing', 'Queued', 'Completed'];
+            const randomStatus = Math.random() > 0.6 ? 'Processing' : 
+                               (Math.random() > 0.5 ? 'Completed' : 'Queued');
+            
+            const statusSpan = item.querySelector('span');
+            if (statusSpan) {
+              // Only update text content, not the whole innerHTML for security
+              if (randomStatus === 'Processing') {
+                statusSpan.textContent = `Processing ${randomPlatform}...`;
+              } else if (randomStatus === 'Completed') {
+                statusSpan.textContent = `Submission to ${randomPlatform} completed`;
+              } else {
+                statusSpan.textContent = `Queued for ${randomPlatform}`;
+              }
+              
+              // Update icon accordingly
+              const icon = item.querySelector('.activity-icon');
+              if (icon) {
+                if (randomStatus === 'Processing') {
+                  icon.innerHTML = '<div class="submission-pulse bg-purple-300 animate-pulse"></div>';
+                  icon.className = 'activity-icon bg-purple-500';
+                } else if (randomStatus === 'Completed') {
+                  icon.innerHTML = '<i class="fas fa-check text-xs"></i>';
+                  icon.className = 'activity-icon bg-green-500';
+                } else {
+                  icon.innerHTML = '<i class="fas fa-clock text-xs"></i>';
+                  icon.className = 'activity-icon bg-yellow-500';
+                }
+              }
+            }
+          }
+        }, 3000);
+      }
+      
+      // Start dashboard animations
+      animateDashboardActivity();
+      
+      // =====================
+      // Handling form submissions
+      // =====================
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Collect form data
+          const formData = new FormData(form);
+          const submitButton = form.querySelector('button[type="submit"]');
+          
+          // Show loading state
+          if (submitButton) {
+            const originalText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+            
+            // Simulate API call 
+            setTimeout(() => {
+              // Success state
+              submitButton.innerHTML = '<i class="fas fa-check mr-2"></i> Sent!';
+              submitButton.classList.add('bg-green-600');
+              
+              // Reset form
+              form.reset();
+              
+              // Reset button after delay
+              setTimeout(() => {
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+                submitButton.classList.remove('bg-green-600');
+              }, 2000);
+            }, 1500);
+          }
+        });
+      });
+      
+      // =====================
+      // Intersection observers for scroll-triggered events
+      // =====================
+      // Lazy loading images
+      const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            const src = img.getAttribute('data-src');
+            if (src) {
+              img.src = src;
+            }
+            observer.unobserve(img);
+          }
+        });
+      });
+      
+      lazyImages.forEach(img => {
+        imageObserver.observe(img);
+      });
+      
+      // =====================
+      // REAL HUMAN TOUCH: Occasional UI adjustments to make things feel less perfect
+      // =====================
+      function addHumanImperfections() {
+        // Slightly randomize some spacings for a more natural feel
+        document.querySelectorAll('.pricing-feature').forEach(feature => {
+          // Add slight random vertical spacing sometimes
+          if (Math.random() > 0.7) {
+            const randomSpacing = Math.random() * 2;
+            feature.style.marginBottom = `${randomSpacing}px`;
+          }
+        });
+        
+        // Occasionally add a subtle transition delay to features
+        document.querySelectorAll('.feature-card').forEach(card => {
+          if (Math.random() > 0.6) {
+            const randomDelay = Math.random() * 0.2;
+            card.style.transitionDelay = `${randomDelay}s`;
+          }
+        });
+        
+        // Simulate minor browser rendering inconsistencies
+        if (Math.random() > 0.5) {
+          const sections = document.querySelectorAll('section');
+          const randomSection = sections[Math.floor(Math.random() * sections.length)];
+          
+          if (randomSection) {
+            // Add a barely noticeable offset that mimics real-world browser inconsistencies
+            const tinyOffset = (Math.random() * 2) - 1; // Between -1 and 1 pixels
+            randomSection.style.marginBottom = `${tinyOffset}px`;
+          }
+        }
+        
+        // Add subtle text rendering variations
+        const headings = document.querySelectorAll('h2, h3');
+        headings.forEach(heading => {
+          if (Math.random() > 0.8) {
+            // Subtle letter spacing variations
+            const letterSpacing = (Math.random() * 0.2) - 0.1; // Between -0.1 and 0.1px
+            heading.style.letterSpacing = `${letterSpacing}px`;
+          }
+        });
+      }
+      
+      // Call this after a delay to simulate real-world rendering quirks
+      setTimeout(addHumanImperfections, 1500);
+
+      // =====================
+      // Detect user behavior to guess their needs
+      // =====================
+      let scrollDepth = 0;
+      let timeOnPage = 0;
+      let hasViewedPricing = false;
+      let hasScrolledUpFromBottom = false;
+      let scrollTimer;
+      
+      // Track scroll depth
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimer);
+        
+        scrollTimer = setTimeout(() => {
+          // Calculate scroll depth as percentage
+          const scrollPosition = window.pageYOffset;
+          const totalHeight = document.body.scrollHeight - window.innerHeight;
+          const newScrollDepth = Math.round((scrollPosition / totalHeight) * 100);
+          
+          // Check if user viewed pricing section
+          const pricingSection = document.getElementById('pricing');
+          if (pricingSection) {
+            const pricingPosition = pricingSection.getBoundingClientRect();
+            if (pricingPosition.top < window.innerHeight && pricingPosition.bottom > 0) {
+              hasViewedPricing = true;
+            }
+          }
+          
+          // Detect scroll up from bottom (indecision)
+          if (scrollDepth > 80 && newScrollDepth < scrollDepth - 15) {
+            hasScrolledUpFromBottom = true;
+          }
+          
+          scrollDepth = newScrollDepth;
+          
+          // Show personalized CTA based on behavior
+          if (timeOnPage > 30 && hasViewedPricing && hasScrolledUpFromBottom) {
+            // User seems interested but indecisive - could show a special offer
+            showPersonalizedCTA();
+          }
+        }, 200);
+      });
+      
+      // Track time on page
+      setInterval(() => {
+        timeOnPage += 1;
+        
+        // Show exit intent after certain time if needed
+        if (timeOnPage > 60 && scrollDepth > 60 && !localStorage.getItem('exitShown')) {
+          // Could implement exit intent popup here
+        }
+      }, 1000);
+      
+      function showPersonalizedCTA() {
+        // Only show once
+        if (document.querySelector('.personalized-cta')) return;
+        
+        // Create personalized CTA
+        const cta = document.createElement('div');
+        cta.className = 'personalized-cta fixed bottom-4 right-4 bg-purple-700 text-white p-4 rounded-lg shadow-lg z-40 max-w-sm transform transition-all duration-500 translate-y-full';
+        cta.innerHTML = `
+          <button class="absolute top-2 right-2 text-white" id="closeCTA">
+            <i class="fas fa-times"></i>
+          </button>
+          <h4 class="font-bold text-lg">Still considering?</h4>
+          <p class="my-2">How about a quick 15-minute demo call with one of our experts?</p>
+          <button class="mt-2 bg-white text-purple-700 py-2 px-4 rounded font-medium hover:bg-purple-100 transition">
+            Schedule Demo
+          </button>
+        `;
+        
+        document.body.appendChild(cta);
+        
+        // Animate in
+        setTimeout(() => {
+          cta.classList.remove('translate-y-full');
+        }, 100);
+        
+        // Close button
+        document.getElementById('closeCTA').addEventListener('click', () => {
+          cta.classList.add('translate-y-full');
+          setTimeout(() => {
+            cta.remove();
+          }, 500);
+        });
+      }
+      
+      // =====================
+      // Handle browser-specific quirks
+      // =====================
+      // These slight adjustments mimic the real-world issues developers face
+      function handleBrowserQuirks() {
+        // Safari-specific fix for sticky positioning
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        
+        if (isIOS || isSafari) {
+          document.querySelectorAll('.timeline-steps').forEach(timeline => {
+            timeline.style.transform = 'translateZ(0)'; // Force GPU acceleration
+          });
+          
+          // Safari sometimes has issues with overflow hidden
+          document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.backfaceVisibility = 'hidden';
+          });
+        }
+        
+        // Firefox smoothness improvement
+        const isFirefox = navigator.userAgent.indexOf('Firefox') !== -1;
+        if (isFirefox) {
+          document.body.classList.add('firefox-fixes');
+          // Add this to CSS separately, or a style tag:
+          // .firefox-fixes .progress-bar-fill { transform: translateZ(0); }
+        }
+        
+        // Older Edge/IE
+        const isIE = /*@cc_on!@*/false || !!document.documentMode;
+        const isEdge = !isIE && !!window.StyleMedia;
+        
+        if (isIE || isEdge) {
+          // Fallback for CSS variables
+          document.querySelectorAll('.gradient-bg').forEach(el => {
+            el.style.background = '#7c3aed';
+          });
+          
+          // Fix flexbox issues in older browsers
+          document.querySelectorAll('.flex').forEach(el => {
+            el.style.display = 'flex';
+          });
+        }
+      }
+      
+      handleBrowserQuirks();
+    });
+  </script>
+</body>
+</html>
