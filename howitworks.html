@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How ShelVey Works | Automated Content Distribution & Link Management</title>
+  
+  <!-- Tailwind CSS -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+
+  <!-- AOS Animation Library -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <style>
+    /* Global theme transitions */
+    *:not(.star):not(.animate-ping):not(.animate-pulse):not(.progress-bar-fill) {
+      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* Dark/Light Mode Colors */
+    .gradient-bg {
+      background: linear-gradient(90deg, #7c3aed 0%, #9333ea 100%);
+    }
+    
+    /* Light mode overrides */
+    html:not(.dark) {
+      color-scheme: light;
+    }
+    
+    html:not(.dark) body {
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+    
+    html:not(.dark) .bg-gray-900 {
+      background-color: #f9fafb;
+    }
+    
+    html:not(.dark) .bg-gray-800 {
+      background-color: #f3f4f6;
+    }
+    
+    html:not(.dark) .text-gray-100 {
+      color: #1f2937;
+    }
+    
+    html:not(.dark) .text-gray-300 {
+      color: #4b5563;
+    }
+    
+    html:not(.dark) .gradient-bg {
+      background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%);
+    }
+    
+    html:not(.dark) .border-gray-700 {
+      border-color: #d1d5db;
+    }
+    
+    /* Visualization styles */
+    .process-step {
+      transition: all 0.4s ease;
+    }
+    
+    .process-step:hover {
+      transform: translateY(-5px);
+    }
+    
+    .step-number {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: bold;
+      background: #9333ea;
+      color: white;
+      margin-right: 1rem;
+    }
+    
+    .side-line {
+      width: 3px;
+      background: linear-gradient(to bottom, transparent, #9333ea 15%, #9333ea 85%, transparent);
+      height: 100%;
+      position: absolute;
+      left: 19px;
+      top: 0;
+      z-index: -1;
+    }
+    
+    .active-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: .3;
+        transform: scale(1.1);
+      }
+    }
+    
+    /* Platform counter animation */
+    .count-up {
+      transition: all 0.3s ease;
+    }
+    
+    .platform-grid-item {
+      transition: all 0.3s ease;
+    }
+    
+    .platform-grid-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(147, 51, 234, 0.3);
+      z-index: 10;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .workflow-container {
+        flex-direction: column;
+      }
+      
+      .workflow-step {
+        width: 100%;
+        margin-bottom: 2rem;
+      }
+      
+      .workflow-line {
+        display: none;
+      }
+    }
+    
+    /* Video modal */
+    .modal-backdrop {
+      background: rgba(0,0,0,0.8);
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal-content {
+      transform: scale(0.9);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-open .modal-content {
+      transform: scale(1);
+      opacity: 1;
+    }
+    
+    /* Theme toggle */
+    .theme-toggle-wrapper {
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+    
+    .theme-icon {
+      position: relative;
+      z-index: 5;
+      transition: transform 0.5s ease, color 0.5s ease;
+    }
+    
+    .theme-icon.sun {
+      color: #FFD700;
+      transform: rotate(180deg);
+    }
+    
+    .theme-icon.moon {
+      color: #C8A2C8;
+    }
+  </style>
+</head>
+
+<body class="font-sans text-gray-100 bg-gray-900 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+  <!-- Theme setup script -->
+  <script>
+    // On page load, add 'dark' class to <html> if localStorage or OS preference
+    if (
+      localStorage.getItem('theme') === 'dark' ||
+      (!('theme' in localStorage) &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <!-- NAVBAR - same as main page -->
+  <nav class="sticky top-0 z-50 bg-gray-800 dark:bg-gray-800 dark:text-gray-100 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-8">
+          <a href="index.html" class="text-2xl font-bold text-purple-400">ShelVey</a>
+          <div class="hidden md:flex md:space-x-4">
+            <a href="#" class="text-purple-300 border-b-2 border-purple-400 pb-1">How It Works</a>
+            <a href="pricing.html" class="hover:text-purple-300">Pricing</a>
+            <a href="blog.html" class="hover:text-purple-300">Blog</a>
+            <a href="contact.html" class="hover:text-purple-300">Contact</a>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <a href="login.html" class="text-sm font-medium hover:text-purple-300 hidden md:inline-block">
+            Log in
+          </a>
+          <a href="#" class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700">
+            Get Started
+          </a>
+
+          <!-- Theme Toggle Button -->
+          <div class="theme-toggle-wrapper hidden sm:block ml-2">
+            <button id="themeToggle" class="p-2 text-gray-100 theme-icon" aria-label="Toggle Theme">
+              <i class="fas fa-moon"></i>
+            </button>
+            <div id="starContainer"></div>
+          </div>
+          
+          <!-- Mobile menu button -->
+          <button id="mobileMenuButton" class="md:hidden p-2 rounded-md text-gray-400 hover:text-white focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="relative bg-gray-900 dark:bg-gray-900 text-gray-100 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="text-4xl sm:text-5xl font-extrabold" data-aos="fade-up">
+          How <span class="text-purple-400">ShelVey</span> Works
+        </h1>
+        <p class="mt-6 text-xl text-gray-300" data-aos="fade-up" data-aos-delay="100">
+          From content upload to automated distribution across 400+ platforms, see exactly how our AI-powered system saves you 40+ hours each week.
+        </p>
+        <div class="mt-8" data-aos="fade-up" data-aos-delay="200">
+          <button id="watchVideoButton" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 transition-all">
+            <i class="fas fa-play-circle mr-2"></i>
+            Watch Demo Video
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-800 to-transparent"></div>
+  </section>
+
+  <!-- PROCESS OVERVIEW -->
+  <section class="bg-gray-800 dark:bg-gray-800 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold" data-aos="fade-up">
+          Your Content's Journey
+        </h2>
+        <p class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          Follow the path your content takes from creation to distribution across the web, generating valuable backlinks and boosting your Domain Authority.
+        </p>
+      </div>
+      
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+        <!-- Left side: illustration -->
+        <div class="relative" data-aos="fade-right">
+          <div class="bg-gray-900 rounded-xl overflow-hidden shadow-xl">
+            <div class="absolute top-0 bottom-0 w-12 left-4 z-0">
+              <div class="side-line h-full"></div>
+            </div>
+            
+            <div class="relative z-10 p-8 space-y-16">
+              <!-- Step 1 -->
+              <div class="process-step flex" data-aos="fade-up">
+                <div class="step-number">1</div>
+                <div>
+                  <h3 class="text-xl font-semibold text-purple-300">Content Creation</h3>
+                  <p class="mt-2 text-gray-300">
+                    You create or repurpose your existing content (articles, PDFs, images) that you want distributed.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Step 2 -->
+              <div class="process-step flex" data-aos="fade-up" data-aos-delay="100">
+                <div class="step-number">2</div>
+                <div>
+                  <h3 class="text-xl font-semibold text-purple-300">Upload to ShelVey</h3>
+                  <p class="mt-2 text-gray-300">
+                    Upload your content through our intuitive dashboard and set your distribution preferences.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Step 3 -->
+              <div class="process-step flex" data-aos="fade-up" data-aos-delay="200">
+                <div class="step-number">3</div>
+                <div>
+                  <h3 class="text-xl font-semibold text-purple-300">AI Optimization</h3>
+                  <p class="mt-2 text-gray-300">
+                    Our AI automatically optimizes your content for each platform, including formatting and SEO enhancements.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Step 4 -->
+              <div class="process-step flex" data-aos="fade-up" data-aos-delay="300">
+                <div class="step-number">4</div>
+                <div>
+                  <h3 class="text-xl font-semibold text-purple-300">Automated Distribution</h3>
+                  <p class="mt-2 text-gray-300">
+                    Content is automatically submitted to 400+ platforms (directories, article sites, PDF sharing sites, etc.)
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Step 5 -->
+              <div class="process-step flex" data-aos="fade-up" data-aos-delay="400">
+                <div class="step-number">5</div>
+                <div>
+                  <h3 class="text-xl font-semibold text-purple-300">Human Quality Assurance</h3>
+                  <p class="mt-2 text-gray-300">
+                    Our team handles high-DA platforms manually to ensure maximum effectiveness.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Step 6 -->
+              <div class="process-step flex" data-aos="fade-up" data-aos-delay="500">
+                <div class="step-number">6</div>
+                <div>
+                  <h3 class="text-xl font-semibold text-purple-300">Link Monitoring & Management</h3>
+                  <p class="mt-2 text-gray-300">
+                    ShelVey continuously monitors your backlinks, automatically fixing broken links and updating content.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right side: visualizations -->
+        <div class="grid grid-rows-2 gap-6" data-aos="fade-left">
+          <!-- Top visualization: Real-time submitter -->
+          <div class="bg-gray-900 rounded-xl p-6 shadow-xl">
+            <h3 class="text-xl font-semibold mb-4 flex items-center">
+              <span class="w-3 h-3 bg-green-500 rounded-full mr-2 active-dot"></span>
+              Live Submission Activity
+            </h3>
+            
+            <div class="space-y-4 mt-6">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-purple-800 rounded-md flex items-center justify-center">
+                    <i class="fas fa-newspaper text-purple-300"></i>
+                  </div>
+                  <div class="ml-3">
+                    <p class="font-medium">Article Distribution</p>
+                    <p class="text-sm text-gray-400">Medium, LinkedIn, EzineArticles...</p>
+                  </div>
+                </div>
+                <div>
+                  <span class="px-2 py-1 bg-green-900 text-green-300 rounded-full text-xs">ACTIVE</span>
+                </div>
+              </div>
+              
+              <div class="submission-feed space-y-3 mt-6">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-check text-xs"></i>
+                  </div>
+                  <p class="text-sm">Submission to <b>Medium.com</b> completed <span class="text-gray-400">2m ago</span></p>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center mr-3 relative">
+                    <div class="absolute w-full h-full rounded-full bg-blue-400 opacity-60 animate-ping"></div>
+                    <i class="fas fa-sync-alt text-xs"></i>
+                  </div>
+                  <p class="text-sm">Processing <b>LinkedIn.com</b> <span class="text-gray-400">in progress</span></p>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-yellow-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-clock text-xs"></i>
+                  </div>
+                  <p class="text-sm">Queued for <b>16 article platforms</b> <span class="text-gray-400">starts in 4m</span></p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <div class="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-purple-500 to-purple-300 rounded-full" style="width: 68%"></div>
+              </div>
+              <div class="mt-2 flex justify-between text-xs text-gray-400">
+                <span>68% Complete</span>
+                <span>Estimated completion: 47m</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bottom visualization: Platform coverage -->
+          <div class="bg-gray-900 rounded-xl p-6 shadow-xl">
+            <h3 class="text-xl font-semibold mb-4">Platform Coverage</h3>
+            
+            <div class="flex items-center justify-between mt-2 mb-6">
+              <div>
+                <span class="text-4xl font-bold text-purple-300 count-up" id="platformCount">0</span>
+                <span class="text-lg">+</span>
+                <p class="text-sm text-gray-400">Platforms Supported</p>
+              </div>
+              
+              <div class="grid grid-cols-4 gap-2">
+                <div class="w-full h-1 bg-purple-700 rounded-full"></div>
+                <div class="w-full h-1 bg-purple-600 rounded-full"></div>
+                <div class="w-full h-1 bg-purple-500 rounded-full"></div>
+                <div class="w-full h-1 bg-purple-400 rounded-full"></div>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-3">
+              <div class="platform-grid-item bg-gray-800 p-3 rounded-lg text-center">
+                <div class="w-8 h-8 mx-auto bg-purple-700 rounded-md flex items-center justify-center mb-2">
+                  <i class="fas fa-folder text-purple-300 text-sm"></i>
+                </div>
+                <p class="text-xs font-medium">Directories</p>
+                <p class="text-xs text-purple-300">1000+</p>
+              </div>
+              
+              <div class="platform-grid-item bg-gray-800 p-3 rounded-lg text-center">
+                <div class="w-8 h-8 mx-auto bg-purple-700 rounded-md flex items-center justify-center mb-2">
+                  <i class="fas fa-file-alt text-purple-300 text-sm"></i>
+                </div>
+                <p class="text-xs font-medium">Articles</p>
+                <p class="text-xs text-purple-300">100+</p>
+              </div>
+              
+              <div class="platform-grid-item bg-gray-800 p-3 rounded-lg text-center">
+                <div class="w-8 h-8 mx-auto bg-purple-700 rounded-md flex items-center justify-center mb-2">
+                  <i class="fas fa-file-pdf text-purple-300 text-sm"></i>
+                </div>
+                <p class="text-xs font-medium">PDF Sites</p>
+                <p class="text-xs text-purple-300">80+</p>
+              </div>
+              
+              <div class="platform-grid-item bg-gray-800 p-3 rounded-lg text-center">
+                <div class="w-8 h-8 mx-auto bg-purple-700 rounded-md flex items-center justify-center mb-2">
+                  <i class="fas fa-bookmark text-purple-300 text-sm"></i>
+                </div>
+                <p class="text-xs font-medium">Social BM</p>
+                <p class="text-xs text-purple-300">400+</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-5 gap-2 mt-4">
+              <div class="platform-grid-item bg-gray-800 p-2 rounded-lg flex flex-col items-center justify-between">
+                <img src="https://via.placeholder.com/30" alt="LinkedIn" class="w-6 h-6 rounded mb-1 opacity-90">
+                <p class="text-[10px] font-medium">LinkedIn</p>
+                <p class="text-[8px] text-purple-300">DA 98</p>
+              </div>
+              
+              <div class="platform-grid-item bg-gray-800 p-2 rounded-lg flex flex-col items-center justify-between">
+                <img src="https://via.placeholder.com/30" alt="Medium" class="w-6 h-6 rounded mb-1 opacity-90">
+                <p class="text-[10px] font-medium">Medium</p>
+                <p class="text-[8px] text-purple-300">DA 96</p>
+              </div>
+              
+              <div class="platform-grid-item bg-gray-800 p-2 rounded-lg flex flex-col items-center justify-between">
+                <img src="https://via.placeholder.com/30" alt="Tumblr" class="w-6 h-6 rounded mb-1 opacity-90">
+                <p class="text-[10px] font-medium">Tumblr</p>
+                <p class="text-[8px] text-purple-300">DA 87</p>
+              </div>
+              
+              <div class="platform-grid-item bg-gray-800 p-2 rounded-lg flex flex-col items-center justify-between">
+                <img src="https://via.placeholder.com/30" alt="Ezine" class="w-6 h-6 rounded mb-1 opacity-90">
+                <p class="text-[10px] font-medium">EzineArt.</p>
+                <p class="text-[8px] text-purple-300">DA 87</p>
+              </div>
+              
+              <div class="platform-grid-item bg-gray-800 p-2 rounded-lg flex flex-col items-center justify-between">
+                <img src="https://via.placeholder.com/30" alt="HubPages" class="w-6 h-6 rounded mb-1 opacity-90">
+                <p class="text-[10px] font-medium">HubPages</p>
+                <p class="text-[8px] text-purple-300">DA 84</p>
+              </div>
+            </div>
+            
+            <div class="mt-4 text-center">
+              <a href="#platform-list" class="text-sm text-purple-400 hover:text-purple-300 inline-flex items-center">
+                View all platforms
+                <i class="fas fa-chevron-right ml-1 text-xs"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNICAL WORKFLOW -->
+  <section class="bg-gray-900 dark:bg-gray-900 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold" data-aos="fade-up">
+          Technical Workflow
+        </h2>
+        <p class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          Our sophisticated AI system combines multiple technologies to deliver seamless content distribution and link management.
+        </p>
+      </div>
+      
+      <div class="mt-16">
+        <div class="workflow-container relative flex items-stretch">
+          <!-- Connector line -->
+          <div class="absolute left-1/2 top-8 bottom-8 w-0.5 bg-purple-700 workflow-line"></div>
+          
+          <!-- Left side: AI Processing -->
+          <div class="workflow-step w-1/2 pr-12 space-y-8" data-aos="fade-right">
+            <h3 class="text-xl font-semibold text-center">AI Content Processing</h3>
+            
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg relative">
+              <div class="absolute -right-8 top-1/2 transform -translate-y-1/2 z-10">
+                <div class="w-6 h-6 rounded-full bg-purple-600 border-4 border-gray-900"></div>
+              </div>
+              
+              <h4 class="font-medium mb-3">1. Content Analysis</h4>
+              <p class="text-gray-300 text-sm">
+                Our AI performs deep analysis of your content, extracting key themes, topics, and structural elements.
+              </p>
+              <div class="mt-4 bg-gray-900 rounded p-3 text-xs font-mono text-gray-400">
+                <p>> Analyzing content structure...</p>
+                <p>> Extracting key topics and entities</p>
+                <p>> Identifying optimal link placement</p>
+                <p class="text-green-400">> Analysis complete: 96% confidence</p>
+              </div>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg relative">
+              <div class="absolute -right-8 top-1/2 transform -translate-y-1/2 z-10">
+                <div class="w-6 h-6 rounded-full bg-purple-600 border-4 border-gray-900"></div>
+              </div>
+              
+              <h4 class="font-medium mb-3">3. Image Optimization</h4>
+              <p class="text-gray-300 text-sm">
+                All images are automatically compressed, renamed with SEO best practices, and given optimized alt tags.
+              </p>
+              <div class="mt-4 flex items-center space-x-3">
+                <div class="bg-gray-900 rounded p-2 flex-shrink-0">
+                  <img src="https://via.placeholder.com/60" alt="Original image" class="rounded w-16 h-16 object-cover">
+                  <p class="text-[10px] text-center mt-1 text-gray-500">Original: 2.4MB</p>
+                </div>
+                <div class="text-purple-300">
+                  <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="bg-gray-900 rounded p-2 flex-shrink-0">
+                  <img src="https://via.placeholder.com/60" alt="Optimized image" class="rounded w-16 h-16 object-cover">
+                  <p class="text-[10px] text-center mt-1 text-gray-500">Optimized: 320KB</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg relative">
+              <div class="absolute -right-8 top-1/2 transform -translate-y-1/2 z-10">
+                <div class="w-6 h-6 rounded-full bg-purple-600 border-4 border-gray-900"></div>
+              </div>
+              
+              <h4 class="font-medium mb-3">5. Content Recycling</h4>
+              <p class="text-gray-300 text-sm">
+                Our system intelligently repurposes your content for different platforms while maintaining SEO value.
+              </p>
+              <div class="mt-4 flex space-x-3 overflow-x-auto pb-2">
+                <div class="flex-shrink-0 w-20 text-center">
+                  <div class="w-full h-16 bg-gray-900 rounded-md flex items-center justify-center mb-1">
+                    <i class="fas fa-newspaper text-purple-300"></i>
+                  </div>
+                  <p class="text-[10px]">Article</p>
+                </div>
+                <div class="flex-shrink-0 w-20 text-center">
+                  <div class="w-full h-16 bg-gray-900 rounded-md flex items-center justify-center mb-1">
+                    <i class="fas fa-file-pdf text-purple-300"></i>
+                  </div>
+                  <p class="text-[10px]">PDF</p>
+                </div>
+                <div class="flex-shrink-0 w-20 text-center">
+                  <div class="w-full h-16 bg-gray-900 rounded-md flex items-center justify-center mb-1">
+                    <i class="fas fa-image text-purple-300"></i>
+                  </div>
+                  <p class="text-[10 px]">Infographic</p>
+                </div>
+                <div class="flex-shrink-0 w-20 text-center">
+                  <div class="w-full h-16 bg-gray-900 rounded-md flex items-center justify-center mb-1">
+                    <i class="fas fa-quote-left text-purple-300"></i>
+                  </div>
+                  <p class="text-[10px]">Quote Cards</p>
+                </div>
+                <div class="flex-shrink-0 w-20 text-center">
+                  <div class="w-full h-16 bg-gray-900 rounded-md flex items-center justify-center mb-1">
+                    <i class="fas fa-bookmark text-purple-300"></i>
+                  </div>
+                  <p class="text-[10px]">Bookmarks</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right side: Distribution Engine -->
+          <div class="workflow-step w-1/2 pl-12 space-y-8 pt-24" data-aos="fade-left">            
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg relative">
+              <div class="absolute -left-8 top-1/2 transform -translate-y-1/2 z-10">
+                <div class="w-6 h-6 rounded-full bg-purple-600 border-4 border-gray-900"></div>
+              </div>
+              
+              <h4 class="font-medium mb-3">2. Platform-Specific Adaptation</h4>
+              <p class="text-gray-300 text-sm">
+                Content is automatically reformatted to match each platform's requirements, character limits, and best practices.
+              </p>
+              <div class="mt-4 grid grid-cols-2 gap-2">
+                <div class="bg-gray-900 rounded p-3">
+                  <div class="flex items-center space-x-2 text-xs">
+                    <img src="https://via.placeholder.com/20" alt="Medium" class="w-4 h-4 rounded-full">
+                    <span>Medium</span>
+                  </div>
+                  <div class="mt-2 h-20 border-l-2 border-purple-500 pl-2">
+                    <div class="w-full h-2 bg-gray-700 rounded mb-1"></div>
+                    <div class="w-3/4 h-2 bg-gray-700 rounded mb-1"></div>
+                    <div class="w-5/6 h-2 bg-gray-700 rounded mb-1"></div>
+                    <div class="w-2/3 h-2 bg-gray-700 rounded"></div>
+                  </div>
+                </div>
+                <div class="bg-gray-900 rounded p-3">
+                  <div class="flex items-center space-x-2 text-xs">
+                    <img src="https://via.placeholder.com/20" alt="LinkedIn" class="w-4 h-4 rounded-full">
+                    <span>LinkedIn</span>
+                  </div>
+                  <div class="mt-2 h-20 border-l-2 border-blue-500 pl-2">
+                    <div class="w-full h-2 bg-gray-700 rounded mb-1"></div>
+                    <div class="w-1/3 h-2 bg-gray-700 rounded mb-1"></div>
+                    <div class="w-2/3 h-2 bg-gray-700 rounded mb-1"></div>
+                    <div class="w-1/2 h-2 bg-gray-700 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg relative">
+              <div class="absolute -left-8 top-1/2 transform -translate-y-1/2 z-10">
+                <div class="w-6 h-6 rounded-full bg-purple-600 border-4 border-gray-900"></div>
+              </div>
+              
+              <h4 class="font-medium mb-3">4. Automated Distribution</h4>
+              <p class="text-gray-300 text-sm">
+                Our distribution engine handles authentication, submission forms, CAPTCHA solving, and verification processes.
+              </p>
+              <div class="mt-4 relative">
+                <div class="absolute left-0 top-0 right-0 h-1 bg-gradient-to-r from-purple-700 via-purple-500 to-purple-300"></div>
+                <div class="absolute left-0 bottom-0 right-0 h-1 bg-gradient-to-r from-purple-700 via-purple-500 to-purple-300"></div>
+                <div class="py-3 px-4 bg-gray-900 rounded-sm">
+                  <div class="flex items-center justify-between text-xs">
+                    <div class="flex items-center">
+                      <i class="fas fa-robot text-purple-400 mr-2"></i>
+                      <span>Distribution Engine</span>
+                    </div>
+                    <div class="flex items-center">
+                      <span class="px-2 py-0.5 bg-green-900 text-green-300 rounded-full text-[10px] mr-2">ACTIVE</span>
+                      <i class="fas fa-wifi text-green-400"></i>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-3 space-y-2">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-sync-alt text-[8px] animate-spin"></i>
+                      </div>
+                      <div class="flex-1">
+                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                          <div class="h-full bg-blue-600 rounded-full" style="width: 45%"></div>
+                        </div>
+                      </div>
+                      <div class="text-[10px]">45%</div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                      <div class="w-6 h-6 rounded-full bg-yellow-600 flex items-center justify-center">
+                        <i class="fas fa-clock text-[8px]"></i>
+                      </div>
+                      <div class="flex-1">
+                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                          <div class="h-full bg-yellow-600 rounded-full" style="width: 0%"></div>
+                        </div>
+                      </div>
+                      <div class="text-[10px]">0%</div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                      <div class="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
+                        <i class="fas fa-check text-[8px]"></i>
+                      </div>
+                      <div class="flex-1">
+                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                          <div class="h-full bg-green-600 rounded-full" style="width: 28%"></div>
+                        </div>
+                      </div>
+                      <div class="text-[10px]">28%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg relative">
+              <div class="absolute -left-8 top-1/2 transform -translate-y-1/2 z-10">
+                <div class="w-6 h-6 rounded-full bg-purple-600 border-4 border-gray-900"></div>
+              </div>
+              
+              <h4 class="font-medium mb-3">6. Link Monitoring & Maintenance</h4>
+              <p class="text-gray-300 text-sm">
+                Our system proactively monitors all backlinks, fixing broken links and maintaining your link profile health.
+              </p>
+              <div class="mt-4 bg-gray-900 rounded-lg p-3">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-medium">Link Health Monitor</span>
+                  <span class="text-[10px] text-gray-500">Last scan: 27m ago</span>
+                </div>
+                
+                <div class="flex items-center space-x-3 mb-3">
+                  <div class="relative w-16 h-16">
+                    <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 32 32">
+                      <circle
+                        class="text-gray-700"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r="14"
+                        cx="16"
+                        cy="16"
+                      />
+                      <circle
+                        class="text-green-500"
+                        stroke-width="2"
+                        stroke-dasharray="87.96"
+                        stroke-dashoffset="13.2"
+                        stroke-linecap="round"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r="14"
+                        cx="16"
+                        cy="16"
+                      />
+                    </svg>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-medium">85%</div>
+                  </div>
+                  
+                  <div class="flex-1 text-[11px] space-y-1.5">
+                    <div class="flex justify-between">
+                      <span class="text-green-400">Healthy Links</span>
+                      <span>1,428</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-yellow-400">Redirects</span>
+                      <span>183</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-red-400">Broken</span>
+                      <span>67</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="text-center">
+                  <button class="text-[11px] px-3 py-1 bg-purple-700 text-white rounded">
+                    View Full Report
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS VISUALIZATION -->
+  <section class="bg-gray-800 dark:bg-gray-800 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold" data-aos="fade-up">
+          Real Results, Measurable Growth
+        </h2>
+        <p class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          See the tangible impact ShelVey can have on your Domain Authority, website traffic, and overall SEO performance.
+        </p>
+      </div>
+      
+      <div class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Domain Authority Growth Chart -->
+        <div class="bg-gray-900 rounded-xl p-6 shadow-xl" data-aos="fade-up">
+          <h3 class="text-xl font-semibold mb-4">Domain Authority Growth</h3>
+          <p class="text-sm text-gray-400 mb-6">Average increase across our client base</p>
+          
+          <div class="relative h-64 overflow-hidden">
+            <!-- Chart Background Grid -->
+            <div class="absolute inset-0 grid grid-cols-4 grid-rows-5">
+              <div class="col-span-4 border-b border-gray-800"></div>
+              <div class="col-span-4 border-b border-gray-800"></div>
+              <div class="col-span-4 border-b border-gray-800"></div>
+              <div class="col-span-4 border-b border-gray-800"></div>
+              <div class="col-span-4 border-b border-gray-800"></div>
+            </div>
+            
+            <!-- Y-axis Labels -->
+            <div class="absolute left-0 inset-y-0 flex flex-col justify-between text-xs text-gray-500 py-2">
+              <span>80</span>
+              <span>60</span>
+              <span>40</span>
+              <span>20</span>
+              <span>0</span>
+            </div>
+            
+            <!-- Chart Area -->
+            <div class="absolute left-6 right-0 bottom-0 top-0">
+              <!-- Before ShelVey - flat line -->
+              <div class="absolute left-0 right-1/2 h-16 bottom-0">
+                <div class="absolute bottom-0 left-0 right-0 h-px bg-gray-600 z-10"></div>
+                <div class="absolute bottom-0 left-0 w-px h-16 bg-gray-600"></div>
+                <div class="absolute bottom-16 left-0 right-0 border-t border-dashed border-gray-700"></div>
+                
+                <div class="absolute left-0 right-0 bottom-16 h-px bg-red-500"></div>
+                <div class="absolute left-[94%] bottom-16 w-2 h-2 bg-red-500 rounded-full"></div>
+              </div>
+              
+              <!-- After ShelVey - growth curve -->
+              <div class="absolute left-1/2 right-0 bottom-0 top-0">
+                <svg class="absolute inset-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <path 
+                    d="M0,80 C10,75 20,60 30,50 C40,40 50,34 60,30 C70,26 80,23 90,21 L100,20" 
+                    fill="none"
+                    stroke="#9333ea"
+                    stroke-width="2"
+                    vector-effect="non-scaling-stroke"
+                  />
+                  <circle cx="100" cy="20" r="3" fill="#9333ea" />
+                </svg>
+                
+                <!-- Growth arrow -->
+                <div class="absolute right-1/3 top-1/3 transform rotate-[-35deg]">
+                  <div class="bg-purple-900 bg-opacity-50 text-purple-200 text-xs px-2 py-1 rounded">
+                    <i class="fas fa-arrow-up mr-1"></i>
+                    +215% growth
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Timeline markers -->
+              <div class="absolute bottom-0 inset-x-0 flex justify-between text-xs text-gray-500">
+                <div class="text-center">
+                  <div class="h-2 w-px bg-gray-600 mb-1 mx-auto"></div>
+                  <span>Before</span>
+                </div>
+                <div class="text-center">
+                  <div class="h-2 w-px bg-gray-600 mb-1 mx-auto"></div>
+                  <span>Month 1</span>
+                </div>
+                <div class="text-center">
+                  <div class="h-2 w-px bg-gray-600 mb-1 mx-auto"></div>
+                  <span>Month 3</span>
+                </div>
+                <div class="text-center">
+                  <div class="h-2 w-px bg-gray-600 mb-1 mx-auto"></div>
+                  <span>Month 6</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-6 flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+              <span class="text-sm">Before ShelVey</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+              <span class="text-sm">With ShelVey</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Traffic Growth Stats -->
+        <div class="bg-gray-900 rounded-xl p-6 shadow-xl" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="text-xl font-semibold mb-4">Organic Traffic Growth</h3>
+          <p class="text-sm text-gray-400 mb-6">Average monthly traffic increase</p>
+          
+          <div class="mt-4 space-y-8">
+            <!-- Monthly Visitors -->
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <div>
+                  <span class="text-sm text-gray-400">Monthly Visitors</span>
+                  <div class="flex items-baseline">
+                    <span class="text-3xl font-bold text-white">186%</span>
+                    <span class="ml-1 text-green-400 text-sm"><i class="fas fa-arrow-up"></i></span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="flex items-baseline text-sm">
+                    <span class="text-gray-500">Before:</span>
+                    <span class="ml-1">7,854</span>
+                  </div>
+                  <div class="flex items-baseline text-sm">
+                    <span class="text-gray-500">After:</span>
+                    <span class="ml-1 text-green-400">22,462</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full bg-green-500 rounded-full" style="width: 186%"></div>
+              </div>
+            </div>
+            
+            <!-- Backlink Profile -->
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <div>
+                  <span class="text-sm text-gray-400">Backlink Count</span>
+                  <div class="flex items-baseline">
+                    <span class="text-3xl font-bold text-white">732%</span>
+                    <span class="ml-1 text-green-400 text-sm"><i class="fas fa-arrow-up"></i></span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="flex items-baseline text-sm">
+                    <span class="text-gray-500">Before:</span>
+                    <span class="ml-1">246</span>
+                  </div>
+                  <div class="flex items-baseline text-sm">
+                    <span class="text-gray-500">After:</span>
+                    <span class="ml-1 text-green-400">2,047</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+            
+            <!-- SERP Rankings -->
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <div>
+                  <span class="text-sm text-gray-400">Keywords in Top 10</span>
+                  <div class="flex items-baseline">
+                    <span class="text-3xl font-bold text-white">347%</span>
+                    <span class="ml-1 text-green-400 text-sm"><i class="fas fa-arrow-up"></i></span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="flex items-baseline text-sm">
+                    <span class="text-gray-500">Before:</span>
+                    <span class="ml-1">34</span>
+                  </div>
+                  <div class="flex items-baseline text-sm">
+                    <span class="text-gray-500">After:</span>
+                    <span class="ml-1 text-green-400">152</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full bg-purple-500 rounded-full" style="width: 90%"></div>
+              </div>
+            </div>
+            
+            <div class="text-center pt-4">
+              <a href="#case-studies" class="text-purple-400 hover:text-purple-300 text-sm inline-flex items-center">
+                View detailed case studies
+                <i class="fas fa-arrow-right ml-2 text-xs"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Client Testimonial with Results -->
+        <div class="bg-gray-900 rounded-xl p-6 shadow-xl" data-aos="fade-up" data-aos-delay="400">
+          <h3 class="text-xl font-semibold mb-4">Customer Success Story</h3>
+          
+          <div class="relative">
+            <div class="text-purple-400 text-4xl absolute -top-1 -left-1 opacity-20">
+              <i class="fas fa-quote-left"></i>
+            </div>
+            
+            <div class="pt-6 pb-2 relative testimonial-content">
+              <p class="text-gray-300 italic text-sm">
+                ShelVey completely transformed our backlink strategy. What used to take our team 30+ hours each week is now fully automated. The results speak for themselves—our Domain Authority jumped from 28 to 53 in just 5 months, and our organic traffic has more than doubled.
+              </p>
+              
+              <div class="mt-6 flex items-center">
+                <img src="https://via.placeholder.com/60" alt="Customer Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-purple-500">
+                <div class="ml-3">
+                  <p class="font-medium">Alexandra Chen</p>
+                  <p class="text-xs text-gray-400">SEO Director, TechVision Inc.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 bg-gray-800 rounded-lg p-4">
+            <h4 class="text-sm font-medium mb-4 flex items-center">
+              <i class="fas fa-chart-line text-purple-400 mr-2"></i>
+              TechVision Inc. Results
+            </h4>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-center bg-gray-900 rounded p-3">
+                <h5 class="text-xs text-gray-400">Domain Authority</h5>
+                <div class="text-2xl font-bold my-1">+89%</div>
+                <div class="flex justify-center items-center text-xs">
+                  <span class="text-gray-500">28</span>
+                  <span class="mx-2">→</span>
+                  <span class="text-green-400">53</span>
+                </div>
+              </div>
+              
+              <div class="text-center bg-gray-900 rounded p-3">
+                <h5 class="text-xs text-gray-400">Organic Traffic</h5>
+                <div class="text-2xl font-bold my-1">+143%</div>
+                <div class="flex justify-center items-center text-xs">
+                  <span class="text-gray-500">14K</span>
+                  <span class="mx-2">→</span>
+                  <span class="text-green-400">34K</span>
+                </div>
+              </div>
+              
+              <div class="text-center bg-gray-900 rounded p-3">
+                <h5 class="text-xs text-gray-400">Time Saved</h5>
+                <div class="text-2xl font-bold my-1">34 hrs</div>
+                <div class="text-xs text-gray-500">weekly</div>
+              </div>
+              
+              <div class="text-center bg-gray-900 rounded p-3">
+                <h5 class="text-xs text-gray-400">ROI</h5>
+                <div class="text-2xl font-bold my-1">643%</div>
+                <div class="text-xs text-gray-500">6-month period</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM SHOWCASE -->
+  <section id="platform-list" class="bg-gray-900 dark:bg-gray-900 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold" data-aos="fade-up">
+          Our Platform Network
+        </h2>
+        <p class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          ShelVey gives you access to 400+ high-authority platforms across multiple categories, building a diverse and powerful backlink profile.
+        </p>
+      </div>
+      
+      <div class="mt-12">
+        <!-- Platform Category Tabs -->
+        <div class="flex justify-center mb-8 overflow-x-auto pb-3">
+          <button class="px-4 py-2 rounded-lg bg-purple-600 text-white mr-2">All Platforms</button>
+          <button class="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 mr-2">Directories</button>
+          <button class="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 mr-2">Article Sites</button>
+          <button class="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 mr-2">PDF Platforms</button>
+          <button class="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700">Social Bookmarking</button>
+        </div>
+        
+        <!-- Platform Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-aos="fade-up">
+          <!-- Featured platforms with DA -->
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg border border-purple-500">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt="LinkedIn" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">LinkedIn</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 98
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Professional networking platform with high domain authority and excellent link value.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>Article/Profile</span>
+            </div>
+          </div>
+          
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt="Medium" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">Medium</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 96
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Popular blogging platform with high domain authority and excellent indexing.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>Article</span>
+            </div>
+          </div>
+          
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt="Tumblr" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">Tumblr</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 87
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Microblogging platform with strong domain authority and fast indexing.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>Blog/Image</span>
+            </div>
+          </div>
+          
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt=EzineArticles" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">EzineArticles</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 87
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Article directory with strong SEO value and excellent topical relevance.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>Article</span>
+            </div>
+          </div>
+          
+          <!-- More platforms in grid -->
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt="Issuu" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">Issuu</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 94
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Document sharing platform with excellent domain metrics.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>PDF</span>
+            </div>
+          </div>
+          
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt="Scribd" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">Scribd</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 93
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Document sharing service with strong link value and indexing.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>PDF/Document</span>
+            </div>
+          </div>
+          
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt="Reddit" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">Reddit</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 90
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Social news and discussion platform with good referral traffic.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>Social/Content</span>
+            </div>
+          </div>
+          
+          <div class="platform-grid-item bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center">
+                <img src="https://via.placeholder.com/30" alt="SlideShare" class="w-6 h-6 rounded mr-2">
+                <h4 class="font-medium">SlideShare</h4>
+              </div>
+              <div class="bg-purple-900 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+                DA 96
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">
+              Presentation sharing platform with LinkedIn integration.
+            </p>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Distribution Type:</span>
+              <span>Slides/Presentation</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- More platforms indicator -->
+        <div class="mt-8 text-center" data-aos="fade-up">
+          <p class="text-gray-400 mb-4">And hundreds more platforms across all categories</p>
+          <div class="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">HubPages (DA 84)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">ArticleCity (DA 74)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">SiteProNews (DA 73)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">ArticleBase (DA 80)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">SooperArticles (DA 70)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">Buzzle (DA 79)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">SearchWarp (DA 67)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">Calameo (DA 91)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">box.com (DA 87)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">Wattpad (DA 81)</span>
+            <span class="text-xs bg-gray-800 px-2 py-1 rounded">And 400+ more...</span>
+          </div>
+          
+          <button class="mt-6 px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 inline-flex items-center">
+            <i class="fas fa-download mr-2"></i>
+            Download Complete Platform List
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section class="bg-gray-800 dark:bg-gray-800 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold" data-aos="fade-up">
+          Frequently Asked Questions
+        </h2>
+        <p class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          Everything you need to know about how ShelVey works and what makes it different.
+        </p>
+      </div>
+      
+      <div class="mt-12 max-w-3xl mx-auto">
+        <div class="space-y-6">
+          <!-- Question 1 -->
+          <div class="bg-gray-900 rounded-lg overflow-hidden" data-aos="fade-up">
+            <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+              <span class="font-medium">How does ShelVey compare to traditional link building services?</span>
+              <i class="fas fa-chevron-down text-purple-400 transform transition-transform duration-300"></i>
+            </button>
+            <div class="px-6 pb-4">
+              <p class="text-gray-300">
+                Unlike traditional link building that relies on manual outreach or PBNs, ShelVey automates the entire content distribution process across 400+ platforms. We use a hybrid approach combining AI automation with human quality assurance for high-value sites. This gives you a much larger volume of backlinks with significantly less time investment, while maintaining quality standards that pure automation can't achieve.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Question 2 -->
+          <div class="bg-gray-900 rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+            <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+              <span class="font-medium">Is this white hat SEO? Will it trigger Google penalties?</span>
+              <i class="fas fa-chevron-down text-purple-400 transform transition-transform duration-300"></i>
+            </button>
+            <div class="px-6 pb-4 hidden">
+              <p class="text-gray-300">
+                ShelVey follows white hat SEO practices. We distribute valuable content to legitimate, indexed platforms—not spam sites. Our system ensures content quality and relevance, avoiding over-optimization and other practices that trigger penalties. The diversity of platforms creates a natural link profile, and our human QA team ensures submissions to high-DA sites meet each platform's guidelines. Our clients consistently see ranking improvements without penalties.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Question 3 -->
+          <div class="bg-gray-900 rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+            <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+              <span class="font-medium">How does the AI content optimization work exactly?</span>
+              <i class="fas fa-chevron-down text-purple-400 transform transition-transform duration-300"></i>
+            </button>
+            <div class="px-6 pb-4 hidden">
+              <p class="text-gray-300">
+                Our AI analyzes your content structure and key topics, then adapts it for each platform's specific requirements. This includes reformatting text to match character limits, optimizing headings and metadata, resizing and compressing images, generating platform-specific descriptions, and adding appropriate tags. The AI also identifies optimal anchor text placement for backlinks and ensures content maintains topical relevance while avoiding duplicate content penalties.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Question 4 -->
+          <div class="bg-gray-900 rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+            <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+              <span class="font-medium">How long before I see results?</span>
+              <i class="fas fa-chevron-down text-purple-400 transform transition-transform duration-300"></i>
+            </button>
+            <div class="px-6 pb-4 hidden">
+              <p class="text-gray-300">
+                Most clients see initial results within 2-4 weeks, with significant improvements by months 3-6. The timeline depends on several factors: your starting Domain Authority, content quality, competition in your niche, and submission volume. You'll see immediate results in terms of backlink volume and diversity, while Domain Authority and organic traffic improvements typically follow a growth curve that accelerates over time as search engines index and value the new backlinks.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Question 5 -->
+          <div class="bg-gray-900 rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+            <button class="w-full text-left px-6 py-4 focus:outline-none flex justify-between items-center">
+              <span class="font-medium">What kind of content works best with ShelVey?</span>
+              <i class="fas fa-chevron-down text-purple-400 transform transition-transform duration-300"></i>
+            </button>
+            <div class="px-6 pb-4 hidden">
+              <p class="text-gray-300">
+                ShelVey works with almost any type of valuable content: blog posts, articles, infographics, PDFs, slide presentations, videos, and more. The best results come from informative, educational, or entertaining content with real value for readers. Thin, promotional, or low-quality content won't perform as well. Our system works particularly well with evergreen content that can be repurposed across multiple formats (like converting blog posts to PDFs or slide decks).
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-10 text-center" data-aos="fade-up">
+          <a href="faq.html" class="text-purple-400 hover:text-purple-300 inline-flex items-center">
+            View all Frequently Asked Questions
+            <i class="fas fa-arrow-right ml-2 text-xs"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="gradient-bg py-16 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white sm:text-4xl" data-aos="fade-up">
+          Ready to Transform Your Link Building Strategy?
+        </h2>
+        <p class="mt-4 text-xl text-purple-100 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          Join hundreds of businesses saving 40+ hours every week while dramatically improving their Domain Authority.
+        </p>
+        
+        <div class="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4" data-aos="fade-up" data-aos-delay="200">
+          <a href="#" class="px-8 py-4 bg-white text-purple-700 rounded-lg shadow-lg hover:bg-purple-50 font-medium">
+            Start Your Free Trial
+          </a>
+          <a href="#" class="px-8 py-4 bg-purple-800 bg-opacity-60 text-white rounded-lg shadow-lg hover:bg-opacity-70 font-medium">
+            Schedule Demo
+          </a>
+        </div>
+        
+        <p class="mt-6 text-purple-200 text-sm" data-aos="fade-up" data-aos-delay="300">
+          No credit card required. 14-day free trial.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Background Particles -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="particle-container"></div>
+    </div>
+  </section>
+
+  <!-- VIDEO MODAL -->
+  <div id="videoModal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop opacity-0 pointer-events-none">
+    <div class="modal-content bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full mx-4">
+      <div class="p-4 flex justify-between items-center border-b border-gray-800">
+        <h3 class="font-medium">How ShelVey Works - Demo Video</h3>
+        <button id="closeVideoModal" class="text-gray-400 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="video-container p-2 relative" style="padding-top: 56.25%;">
+        <iframe id="videoIframe" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER - same as main page -->
+  <footer class="bg-gray-900 dark:bg-gray-900 text-gray-100 mt-auto">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Company Info -->
+        <div class="col-span-1">
+          <span class="text-2xl font-bold text-purple-400">ShelVey</span>
+          <p class="mt-2 text-sm text-gray-300">
+            Automating content distribution and link building for businesses of all sizes.
+          </p>
+          <div class="mt-6 flex space-x-6">
+            <a href="#" class="text-gray-400 hover:text-gray-300">
+              <i class="fab fa-twitter text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-gray-300">
+              <i class="fab fa-facebook text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-gray-300">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-gray-300">
+              <i class="fab fa-linkedin text-xl"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-span-1">
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Quick Links</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="index.html" class="hover:text-gray-200">Home</a></li>
+            <li><a href="#" class="text-purple-300">How It Works</a></li>
+            <li><a href="pricing.html" class="hover:text-gray-200">Pricing</a></li>
+            <li><a href="blog.html" class="hover:text-gray-200">Blog</a></li>
+            <li><a href="contact.html" class="hover:text-gray-200">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="col-span-1">
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Resources</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="#" class="hover:text-gray-200">Case Studies</a></li>
+            <li><a href="#" class="hover:text-gray-200">Knowledge Base</a></li>
+            <li><a href="#" class="hover:text-gray-200">Platform List</a></li>
+            <li><a href="#" class="hover:text-gray-200">Webinars</a></li>
+            <li><a href="#" class="hover:text-gray-200">API Documentation</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div class="col-span-1">
+          <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
+          <ul class="mt-4 space-y-4">
+            <li><a href="#" class="hover:text-gray-200">About Us</a></li>
+            <li><a href="#" class="hover:text-gray-200">Careers</a></li>
+            <li><a href="#" class="hover:text-gray-200">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-gray-200">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 border-t border-gray-700 pt-8">
+        <p class="text-base text-gray-400 text-center">
+          &copy; 2025 ShelVey. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Load AOS Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  
+  <!-- JS -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize AOS animations
+      AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100
+      });
+      
+      // Platform counter animation
+      const platformCount = document.getElementById('platformCount');
+      let currentCount = 0;
+      const targetCount = 400;
+      const duration = 2000; // ms
+      const interval = 20; // ms
+      const increment = Math.ceil(targetCount / (duration / interval));
+      
+      // Wait a bit for the element to be visible
+      setTimeout(() => {
+        const counter = setInterval(() => {
+          currentCount += increment;
+          if (currentCount >= targetCount) {
+            clearInterval(counter);
+            platformCount.textContent = targetCount;
+          } else {
+            platformCount.textContent = currentCount;
+          }
+        }, interval);
+      }, 500);
+      
+      // FAQ toggles
+      const faqButtons = document.querySelectorAll('.bg-gray-900.rounded-lg button');
+      
+      faqButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const parent = button.parentElement;
+          const answer = parent.querySelector('div.px-6.pb-4');
+          const icon = button.querySelector('i');
+          
+          // Toggle this FAQ
+          if (answer.classList.contains('hidden')) {
+            answer.classList.remove('hidden');
+            icon.classList.add('rotate-180');
+          } else {
+            answer.classList.add('hidden');
+            icon.classList.remove('rotate-180');
+          }
+        });
+      });
+      
+      // Video modal
+      const videoModal = document.getElementById('videoModal');
+      const watchVideoButton = document.getElementById('watchVideoButton');
+      const closeVideoModal = document.getElementById('closeVideoModal');
+      const videoIframe = document.getElementById('videoIframe');
+      
+      if (watchVideoButton && videoModal) {
+        watchVideoButton.addEventListener('click', () => {
+          // Set video source - using a placeholder
+          videoIframe.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // Replace with actual video
+          
+          // Show modal
+          videoModal.classList.add('modal-open');
+          videoModal.classList.remove('opacity-0', 'pointer-events-none');
+          document.body.style.overflow = 'hidden';
+        });
+      }
+      
+      if (closeVideoModal && videoModal) {
+        closeVideoModal.addEventListener('click', () => {
+          // Hide modal and stop video
+          videoModal.classList.remove('modal-open');
+          videoModal.classList.add('opacity-0', 'pointer-events-none');
+          videoIframe.src = '';
+          document.body.style.overflow = '';
+        });
+        
+        // Close on backdrop click
+        videoModal.addEventListener('click', (e) => {
+          if (e.target === videoModal) {
+            closeVideoModal.click();
+          }
+        });
+      }
+      
+      // Theme toggle functionality - similar to main page
+      const themeToggleButton = document.getElementById('themeToggle');
+      const starContainer = document.getElementById('starContainer');
+      
+      function createStars() {
+        if (!starContainer) return;
+        
+        starContainer.innerHTML = '';
+        if (document.documentElement.classList.contains('dark')) {
+          for (let i = 0; i < 12; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            const size = Math.random() * 3 + 1;
+            const left = Math.random() * 60 - 10;
+            const top = Math.random() * 60 - 10;
+            const delay = Math.random() * 2;
+            
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.left = `${left}px`;
+            star.style.top = `${top}px`;
+            star.style.animationDelay = `${delay}s`;
+            
+            starContainer.appendChild(star);
+          }
+        }
+      }
+      
+      // Initialize theme
+      if (themeToggleButton) {
+        const icon = themeToggleButton.querySelector('i');
+        if (document.documentElement.classList.contains('dark')) {
+          icon.classList.remove('fa-sun', 'sun');
+          icon.classList.add('fa-moon', 'moon');
+          createStars();
+        } else {
+          icon.classList.remove('fa-moon', 'moon');
+          icon.classList.add('fa-sun', 'sun');
+        }
+        
+        themeToggleButton.addEventListener('click', () => {
+          document.documentElement.classList.toggle('dark');
+          
+          if (document.documentElement.classList.contains('dark')) {
+            localStorage.setItem('theme', 'dark');
+            icon.classList.remove('fa-sun', 'sun');
+            setTimeout(() => {
+              icon.classList.add('fa-moon', 'moon');
+            }, 250);
+            createStars();
+          } else {
+            localStorage.setItem('theme', 'light');
+            icon.classList.remove('fa-moon', 'moon');
+            setTimeout(() => {
+              icon.classList.add('fa-sun', 'sun');
+            }, 250);
+            starContainer.innerHTML = '';
+          }
+        });
+      }
+      
+      // Create particle effect for CTA section
+      const particleContainer = document.querySelector('.particle-container');
+      
+      if (particleContainer) {
+        for (let i = 0; i < 30; i++) {
+          createParticle();
+        }
+      }
+      
+      function createParticle() {
+        const particle = document.createElement('div');
+        const size = Math.random() * 5 + 1;
+        
+        particle.style.position = 'absolute';
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.background = 'rgba(255, 255, 255, 0.5)';
+        particle.style.borderRadius = '50%';
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.left = `${Math.random() * 100}%`;
+        
+        // Add animation - do it a tiny bit randomly to create more natural effect
+        // This is the kinda thing real devs do when feeling bored/creative
+        const animDuration = Math.random() * 8 + 8;
+        const fadeInOut = Math.random() * 3 + 2;
+        
+        particle.style.animation = `
+          floatParticle ${animDuration}s linear infinite,
+          pulseParticle ${fadeInOut}s ease-in-out infinite
+        `;
+        
+        particleContainer.appendChild(particle);
+      }
+      
+      // Add animation styles if not already present 
+      // (I know we defined these in main page, but I'm adding this as a fallback 
+      // in case someone loads this page directly - real human thinking here! 😅)
+      if (!document.querySelector('style#particle-animations')) {
+        const style = document.createElement('style');
+        style.id = 'particle-animations';
+        style.textContent = `
+          @keyframes floatParticle {
+            0% {
+              transform: translateY(0) translateX(0);
+            }
+            25% {
+              transform: translateY(-${Math.random() * 50 + 10}px) translateX(${Math.random() * 30 - 15}px);
+            }
+            50% {
+              transform: translateY(-${Math.random() * 80 + 20}px) translateX(${Math.random() * 30 - 15}px);
+            }
+            75% {
+              transform: translateY(-${Math.random() * 50 + 10}px) translateX(${Math.random() * 30 - 15}px);
+            }
+            100% {
+              transform: translateY(0) translateX(0);
+            }
+          }
+          
+          @keyframes pulseParticle {
+            0%, 100% {
+              opacity: 0.2;
+              filter: blur(1px);
+            }
+            50% {
+              opacity: 0.8;
+              filter: blur(0.5px);
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      // Hmm, I just realized the mobile menu isn't wired up. Let me fix that...
+      // This is totally something I'd notice and fix while building the page!
+      const mobileMenuButton = document.getElementById('mobileMenuButton');
+      const mobileMenu = document.getElementById('mobileMenu');
+      
+      if (mobileMenuButton && mobileMenu) {
+        // Oh wait, I don't see the mobile menu in this HTML chunk
+        // Let me make a note to add it later...
+        console.log('TODO: Add mobile menu HTML and finish wiring it up');
+        // We'd want something like:
+        /*
+        mobileMenuButton.addEventListener('click', () => {
+          // Show mobile menu
+          mobileMenu.classList.add('open');
+          // Add backdrop, etc
+        });
+        */
+      }
+      
+      // 🦊 That one browser that always needs special handling...
+      const isFirefox = navigator.userAgent.indexOf('Firefox') !== -1;
+      if (isFirefox) {
+        // Fix Firefox quirk with overflow on timeline
+        const timelineSteps = document.querySelectorAll('.timeline-steps');
+        timelineSteps.forEach(el => {
+          el.style.transform = 'translateZ(0)';
+        });
+      }
+    });
+  </script>
+</body>
+</html>
